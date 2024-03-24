@@ -25,7 +25,7 @@ Make sure all packages above are installed.
 $ git clone https://github.com/kyleskom/NBA-Machine-Learning-Sports-Betting.git
 $ cd NBA-Machine-Learning-Sports-Betting
 $ pip3 install -r requirements.txt
-$ python3 main.py -xgb -odds=fanduel
+$ python main.py -xgb -odds=fanduel
 ```
 
 Odds data will be automatically fetched from sbrodds if the -odds option is provided with a sportsbook.  Options include: fanduel, draftkings, betmgm, pointsbet, caesars, wynn, bet_rivers_ny
@@ -43,12 +43,22 @@ cd Flask
 flask --debug run
 ```
 
+## Overview
+- Get new data
+  - get_data
+    - Get stats from stats.nba.com, day by day
+  - get_odds_data
+  - create_games
+- Train Models
+  - Money-Line
+  - Under-Over
+
 ## Getting new data and training models
 ```
 # Create dataset with the latest data for 2023-24 season
 cd src/Process-Data
 python -m Get_Data
-python -m Get_Odds_Data
+python -m Get_Odds_Data; 
 python -m Create_Games
 
 # Train models
@@ -60,3 +70,21 @@ python -m XGBoost_Model_UO
 ## Contributing
 
 All contributions welcomed and encouraged.
+
+## Notes:
+Consuming a model may require you to be on the same version of Keras/Tensorflow as the one on which the model was created.
+
+TQDM: Adds a progress bar to iterables in the console output
+
+### Workflow for a day:
+- Get the latest win/loss data (TODO: Append!)
+- Train on the latest win/loss data
+- Run the model on today's games
+- Move the data to the Spreadsheet and figure out the betting strategy
+- Bet!
+### Strategy
+- Bet 10% of bankroll in a given day
+- bet games with 70+% probability
+- Apportion based on relative confidence
+- 
+- Any 0 KC gets the same rank as the lowest value (so i always bet every one)
