@@ -11,7 +11,8 @@ def append_to_csv(home_team_odds, home_team_name, away_team_name, away_team_odds
                'OverUnder Prediction', 'OverUnder Confidence', 'Actual Combined Score']
 
     # Get current date
-    current_date = datetime.now().strftime('%Y-%m-%d %h:%mi:%s')
+    current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 
     # Check if file exists and create it if it does not
     file_exists = os.path.isfile(file_name)
