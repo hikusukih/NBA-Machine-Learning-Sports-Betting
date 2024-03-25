@@ -20,13 +20,13 @@ int_max_team_name_length = 22
 
 def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, kelly_criterion):
     ml_predictions_array = []
-    game_rec = {'home_team_odds': None, 'home_team_name': None,
-                'away_team_name': None, 'away_team_odds': None,
-                'predicted_winner': None, 'win_prediction_confidence': None,
-                'over_under_point': None,
-                'over_under_prediction': None, 'over_under_confidence': None}
+    team_game_rec = {'home_team_odds': None, 'home_team_name': None,
+                     'away_team_name': None, 'away_team_odds': None,
+                     'predicted_winner': None, 'win_prediction_confidence': None,
+                     'over_under_point': None,
+                     'over_under_prediction': None, 'over_under_confidence': None}
 
-    csv_output_array = [game_rec] * len(data)
+    csv_output_array = [team_game_rec] * len(data)
 
     for row in data:
         ml_predictions_array.append(xgb_ml.predict(xgb.DMatrix(np.array([row]))))
@@ -57,14 +57,14 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         str_away_team = ""
 
         if winner == 1:
-            game_rec['predicted_winner'] = str_home_team
+            team_game_rec['predicted_winner'] = str_home_team
             str_home_team += Style.RESET_ALL + Fore.GREEN + home_team.ljust(int_max_team_name_length)
             str_away_team += Style.RESET_ALL + Fore.RED + away_team.rjust(int_max_team_name_length + 8)
 
             winner_confidence = round(winner_confidence[0][1] * 100, 1)
             str_home_team += Style.RESET_ALL + Fore.CYAN + f" ({winner_confidence}%)".rjust(8)
         else:
-            game_rec['predicted_winner'] = str_away_team
+            team_game_rec['predicted_winner'] = str_away_team
             str_away_team += Style.RESET_ALL + Fore.GREEN + away_team.rjust(int_max_team_name_length)
             str_home_team += Style.RESET_ALL + Fore.RED + home_team.ljust(int_max_team_name_length + 8)
 
@@ -115,27 +115,28 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         print(away_team.ljust(22) + ' EV: ' + expected_value_colors['away_color'] + str(ev_away).rjust(6) + Style.RESET_ALL + (bankroll_fraction_away if kelly_criterion else ''))
         count += 1
     count = 0
-    for game_rec in csv_output_array:
-        # print(csv_output_array[count]['home_team_odds'],
-        #       csv_output_array[count]['home_team_name'],
-        #       csv_output_array[count]['away_team_name'],
-        #       csv_output_array[count]['away_team_odds'],
-        #       csv_output_array[count]['predicted_winner'],
-        #       csv_output_array[count]['win_prediction_confidence'],
-        #       csv_output_array[count]['over_under_point'],
-        #       csv_output_array[count]['over_under_prediction'],
-        #       csv_output_array[count]['over_under_confidence'])
-        # print(count, csv_output_array[count])
+    for team_game_rec in csv_output_array:
+
+        print(csv_output_array[count]['home_team_odds'],
+              csv_output_array[count]['home_team_name'],
+              csv_output_array[count]['away_team_name'],
+              csv_output_array[count]['away_team_odds'],
+              csv_output_array[count]['predicted_winner'],
+              csv_output_array[count]['win_prediction_confidence'],
+              csv_output_array[count]['over_under_point'],
+              csv_output_array[count]['over_under_prediction'],
+              csv_output_array[count]['over_under_confidence'])
+        print(count, csv_output_array[count])
         count += 1
         to_csv.append_to_csv(
-            game_rec['home_team_odds'],
-            game_rec['home_team_name'],
-            game_rec['away_team_name'],
-            game_rec['away_team_odds'],
-            game_rec['predicted_winner'],
-            game_rec['win_prediction_confidence'],
-            game_rec['over_under_point'],
-            game_rec['over_under_prediction'],
-            game_rec['over_under_confidence'])
+            team_game_rec['home_team_odds'],
+            team_game_rec['home_team_name'],
+            team_game_rec['away_team_name'],
+            team_game_rec['away_team_odds'],
+            team_game_rec['predicted_winner'],
+            team_game_rec['win_prediction_confidence'],
+            team_game_rec['over_under_point'],
+            team_game_rec['over_under_prediction'],
+            team_game_rec['over_under_confidence'])
 
     deinit()
