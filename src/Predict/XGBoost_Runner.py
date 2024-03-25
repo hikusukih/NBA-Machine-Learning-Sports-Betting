@@ -21,10 +21,10 @@ int_max_team_name_length = 22
 def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, kelly_criterion):
     ml_predictions_array = []
     game_rec = {'home_team_odds': None, 'home_team_name': None,
-                        'away_team_name': None, 'away_team_odds': None,
-                        'predicted_winner': None, 'win_prediction_confidence': None,
-                        'over_under_point': None,
-                        'over_under_prediction': None, 'over_under_confidence': None}
+                'away_team_name': None, 'away_team_odds': None,
+                'predicted_winner': None, 'win_prediction_confidence': None,
+                'over_under_point': None,
+                'over_under_prediction': None, 'over_under_confidence': None}
 
     csv_output_array = [game_rec] * len(data)
 
