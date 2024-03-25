@@ -5,7 +5,7 @@ from datetime import datetime
 
 def append_to_csv(home_team_odds, home_team_name, away_team_name, away_team_odds, predicted_winner,
                   win_prediction_confidence, over_under_point, over_under_prediction,
-                  over_under_confidence, file_name='sports_data.csv'):
+                  over_under_confidence, file_name='out/sports_data.csv'):
     headers = ['Date', 'Home Team Odds', 'Home Team Name', 'Away Team Name', 'Away Team Odds',
                'Predicted Winner', 'Win Prediction Confidence', 'Actual Winner', 'OverUnder Point',
                'OverUnder Prediction', 'OverUnder Confidence', 'Actual Combined Score']
