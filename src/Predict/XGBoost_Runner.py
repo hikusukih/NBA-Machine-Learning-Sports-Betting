@@ -13,9 +13,9 @@ from src.Utils import export as to_csv
 # from src.Utils.tools import get_json_data, to_data_frame, get_todays_games_json, create_todays_games
 init()
 xgb_ml = xgb.Booster()
-xgb_ml.load_model('Models/XGBoost_67.7%_ML-4.json')
+xgb_ml.load_model('Models/ChosenModel/XGBoost_ML-4.json')
 xgb_uo = xgb.Booster()
-xgb_uo.load_model('Models/XGBoost_54.2%_UO-9.json')
+xgb_uo.load_model('Models/ChosenModel/XGBoost_UO-9.json')
 int_max_team_name_length = 22
 
 def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, kelly_criterion):

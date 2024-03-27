@@ -9,8 +9,8 @@ from src.Utils import Expected_Value
 from src.Utils import Kelly_Criterion as kc
 
 init()
-model = load_model('Models/Trained-Model-ML-1711046070.9386299.keras')
-ou_model = load_model('Models/Trained-Model-ML-1711046070.9386299.keras')
+model = load_model('Models/ChosenModel/Trained-Model-ML.keras')
+ou_model = load_model('Models/ChosenModel/Trained-Model-ML.keras')
 
 
 def nn_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, kelly_criterion):
