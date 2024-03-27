@@ -26,7 +26,17 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
                      'over_under_point': None,
                      'over_under_prediction': None, 'over_under_confidence': None}
 
-    csv_output_array = [team_game_rec] * len(data)
+    csv_output_array = [team_game_rec.copy() for _ in range(len(data))]
+    print(f"output array: {csv_output_array}")
+
+    count = 0
+    for team_game_rec in csv_output_array:
+        print(f"home_team_odds_1: {csv_output_array[count]['home_team_odds']}")
+        count += 1
+    count = 0
+    for team_game_rec in csv_output_array:
+        print(f"home_team_odds_2: {csv_output_array[count]['home_team_odds']}")
+        count += 1
 
     for row in data:
         ml_predictions_array.append(xgb_ml.predict(xgb.DMatrix(np.array([row]))))
@@ -43,6 +53,11 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
 
     count = 0
     for game in games:
+        print(f"count: {count}")
+        print(f"uninitialized odds: {csv_output_array[count]['home_team_name']}")
+        csv_output_array[count]['home_team_name'] = count * 2
+        print(f"initialized odds: {csv_output_array[count]['home_team_name']}")
+
         home_team = game[0]
         away_team = game[1]
         winner = int(np.argmax(ml_predictions_array[count]))
@@ -50,6 +65,7 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         winner_confidence = ml_predictions_array[count]
         # print('.>>> Home team: ['+home_team+'] count: ['+str(count)+']')
         csv_output_array[count]['home_team_name'] = home_team
+        print(f"stored home team name: {csv_output_array[count]['home_team_name']}")
         csv_output_array[count]['away_team_name'] = away_team
         csv_output_array[count]['win_prediction_confidence'] = f"{winner_confidence}%"
 
@@ -114,19 +130,24 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         print(home_team.ljust(22) + ' EV: ' + expected_value_colors['home_color'] + str(ev_home).rjust(6) + Style.RESET_ALL + (bankroll_fraction_home if kelly_criterion else ''))
         print(away_team.ljust(22) + ' EV: ' + expected_value_colors['away_color'] + str(ev_away).rjust(6) + Style.RESET_ALL + (bankroll_fraction_away if kelly_criterion else ''))
         count += 1
+
     count = 0
     for team_game_rec in csv_output_array:
+        print(csv_output_array[count]['home_team_name'])
+        count += 1
 
-        print(csv_output_array[count]['home_team_odds'],
-              csv_output_array[count]['home_team_name'],
-              csv_output_array[count]['away_team_name'],
-              csv_output_array[count]['away_team_odds'],
-              csv_output_array[count]['predicted_winner'],
-              csv_output_array[count]['win_prediction_confidence'],
-              csv_output_array[count]['over_under_point'],
-              csv_output_array[count]['over_under_prediction'],
-              csv_output_array[count]['over_under_confidence'])
-        print(count, csv_output_array[count])
+    count = 0
+    for team_game_rec in csv_output_array:
+        # print(csv_output_array[count]['home_team_odds'],
+        #       csv_output_array[count]['home_team_name'],
+        #       csv_output_array[count]['away_team_name'],
+        #       csv_output_array[count]['away_team_odds'],
+        #       csv_output_array[count]['predicted_winner'],
+        #       csv_output_array[count]['win_prediction_confidence'],
+        #       csv_output_array[count]['over_under_point'],
+        #       csv_output_array[count]['over_under_prediction'],
+        #       csv_output_array[count]['over_under_confidence'])
+        # print(count, csv_output_array[count])
         count += 1
         to_csv.append_to_csv(
             team_game_rec['home_team_odds'],
