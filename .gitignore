@@ -104,5 +104,9 @@ python_environment_NBA
 # mypy
 .mypy_cache/
 
+# Transitive output
+Models/XGBoost_*
+!Models/XGBoost_Models/
+
 .idea
 .DS_Store
