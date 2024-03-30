@@ -12,6 +12,15 @@ def append_to_csv(home_team_odds, home_team_name, away_team_name, away_team_odds
                'Home Team Name', 'Away Team Name',
                'Predicted Winner', 'Actual Winner']
 
+    if win_prediction_confidence is None:
+        win_prediction_confidence = 0
+    if over_under_point is None:
+        over_under_point = 0
+    if under_over_confidence is None:
+        under_over_confidence = 0
+    if kelly_percentage is None:
+        kelly_percentage = 0
+
     current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Check if file exists and create it if it does not
