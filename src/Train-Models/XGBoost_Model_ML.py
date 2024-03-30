@@ -51,8 +51,9 @@ with tqdm(total=300) as progress_bar:
         # print(f"{acc}%")
         acc_results.append(acc)
         # only save results if they are the best so far
-        if acc == max(acc_results):
+        best_acc = max(acc_results)
+        if acc == best_acc:
             model.save_model('../../Models/XGBoost_{}%_ML-4.json'.format(acc))
 
-        progress_bar.set_description(f"Accuracy: {acc}")
+        progress_bar.set_description(f"Accuracy: {best_acc}")
         progress_bar.update(1)
