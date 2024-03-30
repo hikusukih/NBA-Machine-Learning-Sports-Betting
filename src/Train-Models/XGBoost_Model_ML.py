@@ -7,6 +7,10 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
+import warnings
+# Filter out FutureWarnings from xgboost
+warnings.filterwarnings("ignore", category=FutureWarning, module='xgboost.*')
+
 dataset = "dataset_2012-24"
 con = sqlite3.connect("../../Data/dataset.sqlite")
 data = pd.read_sql_query(f"select * from \"{dataset}\"", con, index_col="index")
@@ -20,30 +24,35 @@ data = data.values
 
 data = data.astype(float)
 acc_results = []
-for x in tqdm(range(300)):
-    x_train, x_test, y_train, y_test = train_test_split(data, margin, test_size=.1)
 
-    train = xgb.DMatrix(x_train, label=y_train)
-    test = xgb.DMatrix(x_test, label=y_test)
+with tqdm(total=300) as progress_bar:
+    for x in range(300):
+        x_train, x_test, y_train, y_test = train_test_split(data, margin, test_size=.1)
 
-    param = {
-        'max_depth': 3,
-        'eta': 0.01,
-        'objective': 'multi:softprob',
-        'num_class': 2
-    }
-    epochs = 750
+        train = xgb.DMatrix(x_train, label=y_train)
+        test = xgb.DMatrix(x_test, label=y_test)
 
-    model = xgb.train(param, train, epochs)
-    predictions = model.predict(test)
-    y = []
+        param = {
+            'max_depth': 3,
+            'eta': 0.01,
+            'objective': 'multi:softprob',
+            'num_class': 2
+        }
+        epochs = 750
 
-    for z in predictions:
-        y.append(np.argmax(z))
+        model = xgb.train(param, train, epochs)
+        predictions = model.predict(test)
+        y = []
 
-    acc = round(accuracy_score(y_test, y) * 100, 1)
-    print(f"{acc}%")
-    acc_results.append(acc)
-    # only save results if they are the best so far
-    if acc == max(acc_results):
-        model.save_model('../../Models/XGBoost_{}%_ML-4.json'.format(acc))
+        for z in predictions:
+            y.append(np.argmax(z))
+
+        acc = round(accuracy_score(y_test, y) * 100, 1)
+        # print(f"{acc}%")
+        acc_results.append(acc)
+        # only save results if they are the best so far
+        if acc == max(acc_results):
+            model.save_model('../../Models/XGBoost_{}%_ML-4.json'.format(acc))
+
+        progress_bar.set_description(f"Accuracy: {acc}")
+        progress_bar.update(1)
