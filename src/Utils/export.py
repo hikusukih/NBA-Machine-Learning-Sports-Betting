@@ -5,14 +5,23 @@ from datetime import datetime
 
 def append_to_csv(home_team_odds, home_team_name, away_team_name, away_team_odds, predicted_winner,
                   win_prediction_confidence, over_under_point, over_under_prediction,
-                  over_under_confidence, file_name='out/sports_data.csv'):
-    headers = ['Date', 'Home Team Odds', 'Home Team Name', 'Away Team Name', 'Away Team Odds',
-               'Predicted Winner', 'Win Prediction Confidence', 'Actual Winner', 'OverUnder Point',
-               'OverUnder Prediction', 'OverUnder Confidence', 'Actual Combined Score']
+                  under_over_confidence, kelly_percentage, file_name='out/sports_data.csv'):
+    headers = ['Date', 'Win Prediction Confidence', 'Kelly Percentage',
+               'Home Team Odds', 'Away Team Odds',
+               'OverUnder Prediction', 'OverUnder Point', 'OverUnder Confidence', 'Actual Combined Score',
+               'Home Team Name', 'Away Team Name',
+               'Predicted Winner', 'Actual Winner']
 
-    # Get current date
+    if win_prediction_confidence is None:
+        win_prediction_confidence = 0
+    if over_under_point is None:
+        over_under_point = 0
+    if under_over_confidence is None:
+        under_over_confidence = 0
+    if kelly_percentage is None:
+        kelly_percentage = 0
+
     current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
 
     # Check if file exists and create it if it does not
     file_exists = os.path.isfile(file_name)
@@ -23,10 +32,11 @@ def append_to_csv(home_team_odds, home_team_name, away_team_name, away_team_odds
         if not file_exists:
             writer.writerow(headers)
         # Write the data with current date
-        writer.writerow([current_date, home_team_odds, home_team_name, away_team_name, away_team_odds,
-                         predicted_winner, win_prediction_confidence, "", over_under_point,
-                         over_under_prediction, over_under_confidence, ""])
-
+        writer.writerow([current_date, f"{win_prediction_confidence:.2f}".rjust(5), f"{kelly_percentage:.2f}".rjust(5),
+                         str(home_team_odds).rjust(5), str(away_team_odds).rjust(5),
+                         str(over_under_prediction).rjust(5), f"{over_under_point:.1f}".rjust(5),
+                         f"{under_over_confidence:.2f}".rjust(5), "?",
+                         home_team_name, away_team_name, predicted_winner, "?"])
 
 # Example usage
 # append_to_csv(1.5, 'Team A', 'Team B', 2.0, 'Team A', 0.75, 'Team A', 50, 'Over', 0.6, 60)
