@@ -116,7 +116,8 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         if home_team_odds[count] and away_team_odds[count]:
             ev_home = float(Expected_Value.expected_value(ml_predictions_array[count][0][1], int(home_team_odds[count])))
             ev_away = float(Expected_Value.expected_value(ml_predictions_array[count][0][0], int(away_team_odds[count])))
-
+        else:
+            continue
             # print('>>> home team odds: ['+str(home_team_odds[count])+'] away team odds: ['+str(away_team_odds[count])+']')
         expected_value_colors = {'home_color': Fore.GREEN if ev_home > 0 else Fore.RED,
                                  'away_color': Fore.GREEN if ev_away > 0 else Fore.RED}
