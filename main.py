@@ -87,8 +87,15 @@ def createTodaysGames(games, df, odds):
 
 def main():
     odds = None
+
+    if args.t is None:
+        date = ""
+    else:
+        tomorrow = datetime.today() + timedelta(days=1)
+        date = tomorrow.strftime("%Y-%m-%d")
+
     if args.odds:
-        odds = SbrOddsProvider(sportsbook=args.odds).get_odds()
+        odds = SbrOddsProvider(sportsbook=args.odds, date=date).get_odds()
         games = create_todays_games_from_odds(odds)
         if len(games) == 0:
             print("No games found.")
@@ -116,11 +123,11 @@ def main():
         print("-------------------------------------------------------")
     if args.xgb:
         print("---------------XGBoost Model Predictions---------------")
-        XGBoost_Runner.xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, args.kc)
+        XGBoost_Runner.xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, args.kc, date)
         print("-------------------------------------------------------")
     if args.A:
         print("---------------XGBoost Model Predictions---------------")
-        XGBoost_Runner.xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, args.kc)
+        XGBoost_Runner.xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, args.kc, date)
         print("-------------------------------------------------------")
         data = tf.keras.utils.normalize(data, axis=1)
         print("------------Neural Network Model Predictions-----------")
@@ -135,5 +142,7 @@ if __name__ == "__main__":
     parser.add_argument('-A', action='store_true', help='Run all Models')
     parser.add_argument('-odds', help='Sportsbook to fetch from. (fanduel, draftkings, betmgm, pointsbet, caesars, wynn, bet_rivers_ny')
     parser.add_argument('-kc', action='store_true', help='Calculates percentage of bankroll to bet based on model edge')
+    parser.add_argument('-t', action='store_true', help="Run on tomorrow's games")
+
     args = parser.parse_args()
     main()

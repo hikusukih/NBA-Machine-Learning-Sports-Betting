@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -7,6 +8,7 @@ from colorama import Fore, Style, init, deinit
 from src.Utils import Expected_Value
 from src.Utils import Kelly_Criterion as kc
 from src.Utils import export as to_csv
+from src.Utils import ExportMoneyline
 
 
 # from src.Utils.Dictionaries import team_index_current
@@ -18,12 +20,16 @@ xgb_uo = xgb.Booster()
 xgb_uo.load_model('Models/ChosenModel/XGBoost_UO-9.json')
 int_max_team_name_length = 22
 
-def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, kelly_criterion):
+def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, kelly_criterion,
+               p_date=""):
+    if p_date == "":
+        p_date = datetime.today().strftime("%Y-%m-%d")
+
     ml_predictions_array = []
-    team_game_rec = {'home_team_odds': None, 'home_team_name': None,
-                     'away_team_name': None, 'away_team_odds': None,
-                     'predicted_winner': None, 'win_prediction_confidence': None,
-                     'kelly_percentage': None,
+    team_game_rec = {'home_team_odds': None, 'home_team_name': None, 'home_team_win_confidence' : None,
+                     'away_team_name': None, 'away_team_odds': None, 'away_team_win_confidence' : None,
+                     'predicted_winner': None,
+                     'kelly_percentage_home': None, 'kelly_percentage_away': None,
                      'over_under_point': None,
                      'over_under_prediction': None, 'under_over_confidence': None}
 
@@ -49,7 +55,6 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         csv_output_array[count]['away_team_name'] = game[1]
         csv_output_array[count]['away_team_odds'] = away_team_odds[count]
         # csv_output_array[count]['predicted_winner'] = ''
-        # csv_output_array[count]['win_prediction_confidence'] = ''
         csv_output_array[count]['over_under_point'] = todays_games_uo[count]
         csv_output_array[count]['over_under_prediction'] = ''
         # csv_output_array[count]['under_over_confidence'] = ''
@@ -59,7 +64,6 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         winner = int(np.argmax(ml_predictions_array[count]))
         under_over = int(np.argmax(ou_predictions_array[count]))
         winner_confidence = ml_predictions_array[count]
-        csv_output_array[count]['win_prediction_confidence'] = f"{winner_confidence}%"
 
         str_home_team = ""
         str_away_team = ""
@@ -69,7 +73,8 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
             str_home_team += Style.RESET_ALL + Fore.GREEN + home_team.ljust(int_max_team_name_length)
             str_away_team += Style.RESET_ALL + Fore.RED + away_team.rjust(int_max_team_name_length + 8)
             winner_confidence = round(winner_confidence[0][1] * 100, 1)
-            csv_output_array[count]['win_prediction_confidence'] = winner_confidence
+            csv_output_array[count]['home_team_win_confidence'] = winner_confidence
+            csv_output_array[count]['away_team_win_confidence'] = 100 - winner_confidence
             str_home_team += Style.RESET_ALL + Fore.CYAN + f" ({winner_confidence}%)".rjust(8)
         else:
             csv_output_array[count]['predicted_winner'] = away_team
@@ -77,7 +82,8 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
             str_home_team += Style.RESET_ALL + Fore.RED + home_team.ljust(int_max_team_name_length + 8)
 
             winner_confidence = round(winner_confidence[0][0] * 100, 1)
-            csv_output_array[count]['win_prediction_confidence'] = winner_confidence
+            csv_output_array[count]['away_team_win_confidence'] = winner_confidence
+            csv_output_array[count]['home_team_win_confidence'] = 100 - winner_confidence
             str_away_team += Style.RESET_ALL + Fore.CYAN + f" ({winner_confidence}%)".rjust(8)
 
         str_uo = ""
@@ -126,8 +132,8 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         kelly_home_team = kc.calculate_kelly_criterion(home_team_odds[count], ml_predictions_array[count][0][1])
         kelly_away_team = kc.calculate_kelly_criterion(away_team_odds[count], ml_predictions_array[count][0][0])
 
-        csv_output_array[count]['kelly_percentage'] = kelly_home_team
-        csv_output_array[count]['kelly_percentage'] = kelly_away_team
+        csv_output_array[count]['kelly_percentage_home'] = kelly_home_team
+        csv_output_array[count]['kelly_percentage_away'] = kelly_away_team
 
         bankroll_fraction_home = bankroll_descriptor + str(kelly_home_team) + '%'
         bankroll_fraction_away = bankroll_descriptor + str(kelly_away_team) + '%'
@@ -137,16 +143,39 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         count += 1
 
     for team_game_rec in csv_output_array:
+        ExportMoneyline.append_to_csv(
+            p_team_name=team_game_rec['home_team_name'],
+            p_win_prediction_confidence=team_game_rec['home_team_win_confidence'],
+            p_current_odds=team_game_rec['home_team_odds'],
+            p_game_date=p_date
+        )
+        ExportMoneyline.append_to_csv(
+            p_team_name=team_game_rec['away_team_name'],
+            p_win_prediction_confidence=team_game_rec['away_team_win_confidence'],
+            p_current_odds=team_game_rec['away_team_odds'],
+            p_game_date=p_date
+        )
         to_csv.append_to_csv(
             team_game_rec['home_team_odds'],
             team_game_rec['home_team_name'],
-            team_game_rec['away_team_name'],
-            team_game_rec['away_team_odds'],
+            "",
+            "",
             team_game_rec['predicted_winner'],
-            team_game_rec['win_prediction_confidence'],
+            team_game_rec['home_team_win_confidence'],
             team_game_rec['over_under_point'],
             team_game_rec['over_under_prediction'],
             team_game_rec['under_over_confidence'],
-            team_game_rec['kelly_percentage'])
+            team_game_rec['kelly_percentage_home'])
+        to_csv.append_to_csv(
+            "",
+            "",
+            team_game_rec['away_team_name'],
+            team_game_rec['away_team_odds'],
+            team_game_rec['predicted_winner'],
+            team_game_rec['away_team_win_confidence'],
+            team_game_rec['over_under_point'],
+            team_game_rec['over_under_prediction'],
+            team_game_rec['under_over_confidence'],
+            team_game_rec['kelly_percentage_away'])
 
     deinit()
