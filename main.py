@@ -87,12 +87,11 @@ def createTodaysGames(games, df, odds):
 
 def main():
     odds = None
-
-    if args.t is None:
-        date = ""
-    else:
+    if args.t:
         tomorrow = datetime.today() + timedelta(days=1)
         date = tomorrow.strftime("%Y-%m-%d")
+    else:
+        date = datetime.today().strftime("%Y-%m-%d")
 
     if args.odds:
         odds = SbrOddsProvider(sportsbook=args.odds, date=date).get_odds()

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sbrscrape import Scoreboard
 
 class SbrOddsProvider:
@@ -8,8 +10,8 @@ class SbrOddsProvider:
         string: Full location name
     """    
 
-    def __init__(self, sportsbook="fanduel"):
-        sb = Scoreboard(sport="NBA")
+    def __init__(self, sportsbook="fanduel", date=datetime.today().strftime("%Y-%m-%d")):
+        sb = Scoreboard(sport="NBA", date=date)
         self.games = sb.games if hasattr(sb, 'games') else []
         self.sportsbook = sportsbook
 
