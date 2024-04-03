@@ -50,6 +50,9 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
 
     count = 0
     for game in games:
+        print(f'>>>XGBoost_Runner>>> game: {game}')
+        print(f'>>>XGBoost_Runner>>> data[count]: {data[count]}')
+        print(f'>>>XGBoost_Runner>>> ml_predictions_array[count]: {ml_predictions_array[count]}')
         csv_output_array[count]['home_team_odds'] = home_team_odds[count]
         csv_output_array[count]['home_team_name'] = game[0]
         csv_output_array[count]['away_team_name'] = game[1]
@@ -63,7 +66,7 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
         away_team = game[1]
         winner = int(np.argmax(ml_predictions_array[count]))
         under_over = int(np.argmax(ou_predictions_array[count]))
-        winner_confidence = ml_predictions_array[count]
+        winner_confidence_vector = ml_predictions_array[count]
 
         str_home_team = ""
         str_away_team = ""
@@ -72,18 +75,20 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
             csv_output_array[count]['predicted_winner'] = home_team
             str_home_team += Style.RESET_ALL + Fore.GREEN + home_team.ljust(int_max_team_name_length)
             str_away_team += Style.RESET_ALL + Fore.RED + away_team.rjust(int_max_team_name_length + 8)
-            winner_confidence = round(winner_confidence[0][1] * 100, 1)
+            winner_confidence = round(winner_confidence_vector[0][1] * 100, 1)
+            loser_confidence = round(winner_confidence_vector[0][0] * 100, 1)
             csv_output_array[count]['home_team_win_confidence'] = winner_confidence
-            csv_output_array[count]['away_team_win_confidence'] = 100 - winner_confidence
+            csv_output_array[count]['away_team_win_confidence'] = loser_confidence
             str_home_team += Style.RESET_ALL + Fore.CYAN + f" ({winner_confidence}%)".rjust(8)
         else:
             csv_output_array[count]['predicted_winner'] = away_team
             str_away_team += Style.RESET_ALL + Fore.GREEN + away_team.rjust(int_max_team_name_length)
             str_home_team += Style.RESET_ALL + Fore.RED + home_team.ljust(int_max_team_name_length + 8)
 
-            winner_confidence = round(winner_confidence[0][0] * 100, 1)
+            winner_confidence = round(winner_confidence_vector[0][0] * 100, 1)
             csv_output_array[count]['away_team_win_confidence'] = winner_confidence
-            csv_output_array[count]['home_team_win_confidence'] = 100 - winner_confidence
+            loser_confidence = round(winner_confidence_vector[0][1] * 100, 1)
+            csv_output_array[count]['home_team_win_confidence'] = loser_confidence
             str_away_team += Style.RESET_ALL + Fore.CYAN + f" ({winner_confidence}%)".rjust(8)
 
         str_uo = ""
