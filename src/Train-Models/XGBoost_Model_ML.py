@@ -33,12 +33,20 @@ with tqdm(total=300) as progress_bar:
         test = xgb.DMatrix(x_test, label=y_test)
 
         param = {
-            'max_depth': 3,
+            "max_depth": 3,
+            "learning_rate": 0.1,
+            # "n_estimators": 200,
+            "subsample": 0.6,
+            "colsample_bytree": 0.6,
+            "min_child_weight": 4,
+
             'eta': 0.01,
+            # 'n_estimators': 300,
+            'num_class': 2,
             'objective': 'multi:softprob',
-            'num_class': 2
+
         }
-        epochs = 750
+        epochs = 800
 
         model = xgb.train(param, train, epochs)
         predictions = model.predict(test)
