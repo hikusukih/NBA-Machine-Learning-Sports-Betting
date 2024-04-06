@@ -1,0 +1,73 @@
+Date,Win Prediction Confidence,Kelly Percentage,Home Team Odds,Away Team Odds,OverUnder Prediction,OverUnder Point,OverUnder Confidence,Actual Combined Score,Home Team Name,Away Team Name,Predicted Winner,Actual Winner
+2024-03-27 18:06:27,72.50, 0.00,  340, -430, OVER,206.5,66.80,?,Charlotte Hornets,Cleveland Cavaliers,Cleveland Cavaliers,?
+2024-03-27 18:06:27,65.30, 0.00, -188,  156, OVER,217.5,55.80,?,Orlando Magic,Golden State Warriors,Orlando Magic,?
+2024-03-27 18:06:27,64.60, 5.69,  140, -166,UNDER,221.0,57.20,?,Washington Wizards,Brooklyn Nets,Brooklyn Nets,?
+2024-03-27 18:06:27,70.70,12.08, -550,  410, OVER,217.5,61.80,?,Atlanta Hawks,Portland Trail Blazers,Atlanta Hawks,?
+2024-03-27 18:06:27,52.80, 0.00,  215, -260,UNDER,215.0,62.40,?,Philadelphia 76ers,LA Clippers,LA Clippers,?
+2024-03-27 18:06:27,69.60, 0.00,  660,-1000,UNDER,211.5,56.20,?,Toronto Raptors,New York Knicks,New York Knicks,?
+2024-03-27 18:06:27,51.20, 0.00,  118, -138,UNDER,235.0,93.00,?,Chicago Bulls,Indiana Pacers,Chicago Bulls,?
+2024-03-27 18:06:27,67.60, 6.55,  158, -188,UNDER,223.5,54.60,?,Memphis Grizzlies,Los Angeles Lakers,Los Angeles Lakers,?
+2024-03-27 18:06:27,85.60, 4.89,-1600,  900, OVER,216.0,53.00,?,Minnesota Timberwolves,Detroit Pistons,Minnesota Timberwolves,?
+2024-03-27 18:06:27,69.60, 0.00, -188,  158,UNDER,226.5,85.80,?,Oklahoma City Thunder,Houston Rockets,Oklahoma City Thunder,?
+2024-03-27 18:06:27,60.40, 1.89, -190,  160,UNDER,229.0,93.30,?,Utah Jazz,San Antonio Spurs,Utah Jazz,?
+2024-03-27 18:06:27,64.80, 8.71, -300,  245,UNDER,227.5,91.30,?,Denver Nuggets,Phoenix Suns,Denver Nuggets,?
+2024-03-28 07:25:29,68.10, 0.00, 1300,-3500, OVER,227.0,71.40,?,Atlanta Hawks,Boston Celtics,Boston Celtics,?
+2024-03-28 07:25:29,56.60, 0.00,  110, -130,UNDER,223.5,92.00,?,New Orleans Pelicans,Milwaukee Bucks,New Orleans Pelicans,?
+2024-03-29 16:24:57,60.10, 0.00, None, None,UNDER,  0.0,84.10,?,Indiana Pacers,Los Angeles Lakers,Indiana Pacers,?
+2024-03-29 16:24:57,50.80, 0.00, None, None,UNDER,  0.0,84.90,?,Orlando Magic,LA Clippers,LA Clippers,?
+2024-03-29 16:24:57,68.10, 0.00, None, None,UNDER,  0.0,90.30,?,Charlotte Hornets,Golden State Warriors,Golden State Warriors,?
+2024-03-29 16:24:57,50.70, 0.00, None, None, OVER,  0.0,76.10,?,Washington Wizards,Detroit Pistons,Detroit Pistons,?
+2024-03-29 16:24:57,52.10, 0.00, None, None,UNDER,  0.0,80.00,?,Brooklyn Nets,Chicago Bulls,Chicago Bulls,?
+2024-03-29 16:24:57,63.60, 0.00, None, None,UNDER,  0.0,90.40,?,Cleveland Cavaliers,Philadelphia 76ers,Cleveland Cavaliers,?
+2024-03-29 16:24:57,65.50, 0.00, None, None,UNDER,  0.0,82.40,?,Oklahoma City Thunder,Phoenix Suns,Oklahoma City Thunder,?
+2024-03-29 16:24:57,79.90, 0.00, None, None,UNDER,  0.0,71.20,?,Miami Heat,Portland Trail Blazers,Miami Heat,?
+2024-03-29 16:24:57,69.40, 0.00, None, None,UNDER,  0.0,78.90,?,San Antonio Spurs,New York Knicks,New York Knicks,?
+2024-03-29 16:24:57,51.00, 0.00, None, None,UNDER,  0.0,96.90,?,Denver Nuggets,Minnesota Timberwolves,Denver Nuggets,?
+2024-03-29 16:24:57,61.30, 0.00, None, None,UNDER,  0.0,66.60,?,Utah Jazz,Houston Rockets,Houston Rockets,?
+2024-03-29 16:24:57,53.30, 0.00, None, None, OVER,  0.0,60.30,?,Sacramento Kings,Dallas Mavericks,Dallas Mavericks,?
+2024-03-30 00:31:48,57.00, 0.00, None, None,UNDER,  0.0,85.00,?,New Orleans Pelicans,Boston Celtics,Boston Celtics,?
+2024-03-30 00:31:48,73.50, 0.00, None, None,UNDER,  0.0,83.20,?,Orlando Magic,Memphis Grizzlies,Orlando Magic,?
+2024-03-30 00:31:48,63.70, 0.00, None, None,UNDER,  0.0,52.70,?,Atlanta Hawks,Milwaukee Bucks,Milwaukee Bucks,?
+2024-03-30 16:51:16,57.00, 0.00,  190, -230,UNDER,223.5,59.40,?,New Orleans Pelicans,Boston Celtics,Boston Celtics,?
+2024-03-30 16:51:16,73.50,14.49, -900,  610, OVER,207.0,59.00,?,Orlando Magic,Memphis Grizzlies,Orlando Magic,?
+2024-03-30 16:51:16,63.70, 0.00,  152, -180, OVER,223.0,69.70,?,Atlanta Hawks,Milwaukee Bucks,Milwaukee Bucks,?
+2024-03-31 00:02:11,64.80, 0.00, -210,     ,UNDER,214.0,55.40,?,Denver Nuggets,,Denver Nuggets,?
+2024-03-31 00:02:11,35.20, 0.00,     ,  176,UNDER,214.0,55.40,?,,Cleveland Cavaliers,Denver Nuggets,?
+2024-03-31 00:02:11,77.90, 0.00,  830,     ,UNDER,215.0,65.90,?,Charlotte Hornets,,LA Clippers,?
+2024-03-31 00:02:11,22.10, 0.00,     ,-1400,UNDER,215.0,65.90,?,,LA Clippers,LA Clippers,?
+2024-03-31 00:02:11,65.70, 0.00,  194,     , OVER,223.0,74.90,?,Brooklyn Nets,,Los Angeles Lakers,?
+2024-03-31 00:02:11,34.30, 0.00,     , -235, OVER,223.0,74.90,?,,Los Angeles Lakers,Los Angeles Lakers,?
+2024-03-31 00:02:11,76.40, 0.00,  460,     ,UNDER,217.5,56.30,?,Washington Wizards,,Miami Heat,?
+2024-03-31 00:02:11,23.60, 0.00,     , -620,UNDER,217.5,56.30,?,,Miami Heat,Miami Heat,?
+2024-03-31 00:02:11,66.80, 0.00,  460,     , OVER,218.5,53.20,?,Toronto Raptors,,Philadelphia 76ers,?
+2024-03-31 00:02:11,33.20, 0.00,     , -620, OVER,218.5,53.20,?,,Philadelphia 76ers,Philadelphia 76ers,?
+2024-03-31 00:02:11,74.70, 0.00, -360,     , OVER,212.5,52.40,?,Minnesota Timberwolves,,Minnesota Timberwolves,?
+2024-03-31 00:02:11,25.30, 0.00,     ,  290, OVER,212.5,52.40,?,,Chicago Bulls,Minnesota Timberwolves,?
+2024-03-31 00:02:11,66.20, 0.00,  280,     ,UNDER,227.5,64.70,?,San Antonio Spurs,,Golden State Warriors,?
+2024-03-31 00:02:11,33.80, 0.00,     , -350,UNDER,227.5,64.70,?,,Golden State Warriors,Golden State Warriors,?
+2024-03-31 00:02:11,53.40,18.06, -156,     , OVER,215.0,54.20,?,New York Knicks,,Oklahoma City Thunder,?
+2024-03-31 00:02:11,46.60,18.06,     ,  132, OVER,215.0,54.20,?,,Oklahoma City Thunder,Oklahoma City Thunder,?
+2024-03-31 00:02:11,51.90, 0.00,  102,     , OVER,231.5,70.60,?,Houston Rockets,,Houston Rockets,?
+2024-03-31 00:02:11,48.10, 0.00,     , -120, OVER,231.5,70.60,?,,Dallas Mavericks,Houston Rockets,?
+2024-03-31 00:02:11,69.60,18.19, -820,     , OVER,223.5,54.40,?,Sacramento Kings,,Sacramento Kings,?
+2024-03-31 00:02:11,30.40,18.19,     ,  570, OVER,223.5,54.40,?,,Utah Jazz,Sacramento Kings,?
+2024-03-31 01:53:15,65.70, 0.00, -225,     ,UNDER,213.5,61.50,?,Denver Nuggets,,Denver Nuggets,?
+2024-03-31 01:53:15,34.30, 0.00,     ,  188,UNDER,213.5,61.50,?,,Cleveland Cavaliers,Denver Nuggets,?
+2024-03-31 01:53:15,77.90, 0.00,  830,     ,UNDER,215.0,65.90,?,Charlotte Hornets,,LA Clippers,?
+2024-03-31 01:53:15,22.10, 0.00,     ,-1400,UNDER,215.0,65.90,?,,LA Clippers,LA Clippers,?
+2024-03-31 01:53:15,65.70, 0.00,  194,     , OVER,223.0,74.90,?,Brooklyn Nets,,Los Angeles Lakers,?
+2024-03-31 01:53:15,34.30, 0.00,     , -235, OVER,223.0,74.90,?,,Los Angeles Lakers,Los Angeles Lakers,?
+2024-03-31 01:53:15,76.40, 0.00,  460,     ,UNDER,217.5,56.30,?,Washington Wizards,,Miami Heat,?
+2024-03-31 01:53:15,23.60, 0.00,     , -620,UNDER,217.5,56.30,?,,Miami Heat,Miami Heat,?
+2024-03-31 01:53:15,66.80, 0.00,  460,     , OVER,218.5,53.20,?,Toronto Raptors,,Philadelphia 76ers,?
+2024-03-31 01:53:15,33.20, 0.00,     , -620, OVER,218.5,53.20,?,,Philadelphia 76ers,Philadelphia 76ers,?
+2024-03-31 01:53:15,75.40, 0.00, -360,     , OVER,212.5,54.10,?,Minnesota Timberwolves,,Minnesota Timberwolves,?
+2024-03-31 01:53:15,24.60, 0.00,     ,  290, OVER,212.5,54.10,?,,Chicago Bulls,Minnesota Timberwolves,?
+2024-03-31 01:53:15,66.20, 0.00,  280,     ,UNDER,227.5,64.70,?,San Antonio Spurs,,Golden State Warriors,?
+2024-03-31 01:53:15,33.80, 0.00,     , -350,UNDER,227.5,64.70,?,,Golden State Warriors,Golden State Warriors,?
+2024-03-31 01:53:15,53.40,17.51, -154,     , OVER,214.5,54.00,?,New York Knicks,,Oklahoma City Thunder,?
+2024-03-31 01:53:15,46.60,17.51,     ,  130, OVER,214.5,54.00,?,,Oklahoma City Thunder,Oklahoma City Thunder,?
+2024-03-31 01:53:15,52.80, 0.00,  110,     , OVER,231.5,72.40,?,Houston Rockets,,Houston Rockets,?
+2024-03-31 01:53:15,47.20, 0.00,     , -130, OVER,231.5,72.40,?,,Dallas Mavericks,Houston Rockets,?
+2024-03-31 01:53:15,66.20,23.00, -900,     , OVER,223.5,65.10,?,Sacramento Kings,,Sacramento Kings,?
+2024-03-31 01:53:15,33.80,23.00,     ,  610, OVER,223.5,65.10,?,,Utah Jazz,Sacramento Kings,?
