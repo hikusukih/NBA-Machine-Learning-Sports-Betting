@@ -85,13 +85,8 @@ def createTodaysGames(games, df, odds):
     return data, todays_games_uo, frame_ml, home_team_odds, away_team_odds
 
 
-def main():
+def main(date):
     odds = None
-    if args.t:
-        tomorrow = datetime.today() + timedelta(days=1)
-        date = tomorrow.strftime("%Y-%m-%d")
-    else:
-        date = datetime.today().strftime("%Y-%m-%d")
 
     if args.odds:
         odds = SbrOddsProvider(sportsbook=args.odds, date=date).get_odds()
@@ -130,7 +125,7 @@ def main():
         print("-------------------------------------------------------")
         data = tf.keras.utils.normalize(data, axis=1)
         print("------------Neural Network Model Predictions-----------")
-        NN_Runner.nn_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, args.kc)
+        NN_Runner.nn_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, args.kc, date)
         print("-------------------------------------------------------")
 
 
@@ -141,7 +136,20 @@ if __name__ == "__main__":
     parser.add_argument('-A', action='store_true', help='Run all Models')
     parser.add_argument('-odds', help='Sportsbook to fetch from. (fanduel, draftkings, betmgm, pointsbet, caesars, wynn, bet_rivers_ny')
     parser.add_argument('-kc', action='store_true', help='Calculates percentage of bankroll to bet based on model edge')
-    parser.add_argument('-t', action='store_true', help="Run on tomorrow's games")
+    parser.add_argument('-t', '--date', nargs='?', const='tomorrow', default='today',
+                        help="Run for a specific date in YYYY-MM-DD or 'tomorrow' if no date is given.")
 
     args = parser.parse_args()
-    main()
+    # Determine the date based on arguments
+    if args.date == 'today':
+        date = datetime.today().strftime("%Y-%m-%d")
+    elif args.date == 'tomorrow':
+        date = (datetime.today() + timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        try:
+            # Validate and use the provided date
+            date = datetime.strptime(args.date, "%Y-%m-%d").strftime("%Y-%m-%d")
+        except ValueError:
+            raise ValueError("Invalid date format. Please use YYYY-MM-DD.")
+
+    main(date)
