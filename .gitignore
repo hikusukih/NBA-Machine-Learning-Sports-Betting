@@ -110,3 +110,5 @@ Models/XGBoost_*
 
 .idea
 .DS_Store
+src/Train-Models/history.csv
+src/Train-Models/Untitled2.ipynb
