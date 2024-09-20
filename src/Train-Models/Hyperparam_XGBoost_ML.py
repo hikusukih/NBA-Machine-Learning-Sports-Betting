@@ -1,3 +1,5 @@
+import itertools
+import random
 import sqlite3
 
 import numpy as np
@@ -17,16 +19,22 @@ n_iter = 100
 # Load your data
 dataset = "dataset_2012-24"
 con = sqlite3.connect("../../Data/dataset.sqlite")
-data = pd.read_sql_query(f"SELECT * FROM \"{dataset}\"", con, index_col="index")
+data = pd.read_sql_query(f"SELECT * FROM \"{dataset}\" order by Date", con, index_col="index")
 con.close()
 
 # Prepare your data
 margin = data['Home-Team-Win']
-data.drop(['Score', 'Home-Team-Win', 'TEAM_NAME', 'Date', 'TEAM_NAME.1', 'Date.1', 'OU-Cover', 'OU'], axis=1, inplace=True)
-data = data.values.astype(float)
+data.drop(['Score',
+           # 'Home-Team-Win',
+           'TEAM_NAME',
+           # 'Date',
+           'TEAM_NAME.1', 'Date.1',
+           'OU-Cover', 'OU'], axis=1, inplace=True)
+# data = data.values.astype(float)
 
+data['Date'] = pd.to_datetime(data['Date'])
 # Split the dataset into training and testing sets
-x_train, x_test, y_train, y_test = train_test_split(data, margin, test_size=0.1, random_state=32)
+# x_train, x_test, y_train, y_test = train_test_split(data, margin, test_size=0.1, random_state=32)
 
 
 # Initialize XGBoost Classifier
@@ -61,80 +69,88 @@ x_train, x_test, y_train, y_test = train_test_split(data, margin, test_size=0.1,
 #         with open(best_parameters_so_far, 'w') as f:
 #             json.dump(best_params, f, indent=4)
 #             print(f"New best model with score: {best_score}")
+
+# Define the hyperparameter grid
+param_grid = {
+    'max_depth': [3,6,4, 5 ,7],
+    'learning_rate': [ 0.1, 0.05,0.01],
+    'n_estimators': [200, 300,100],
+    'subsample': [0.8, 0.7, 0.9, 0.6],
+    'colsample_bytree': [0.55 , 0.8, 0.7, 0.95],
+    'min_child_weight': [4, 3, 1, 2],
+    'eta': [.01, .015],
+    'split_date': [pd.Timestamp('2023-12-01'),
+                   pd.Timestamp('2023-08-01')],
+    'tree_method': ['gpu_hist', 'approx', 'hist']
+}
+
+# Create all combinations of parameters
+all_params_combos = [dict(zip(param_grid, v)) for v in itertools.product(*param_grid.values())]
+random.shuffle(all_params_combos)
 # Initialize variables to track the best model
 best_score = -np.inf
 best_params = None
 
-# Define the hyperparameter grid
-param_grid = {
-    'max_depth': [#3,6,4,5,7,
-        8],
-    'learning_rate': [ 0.1, 0.05, 0.01],
-    'n_estimators': [200, 400, 300, 100],
-    'subsample': [0.8, 0.7, 0.9, 0.6],
-    'colsample_bytree': [0.6, 0.8, 0.7, 0.9],
-    'min_child_weight': [4, 3, 1, 2],
-
-    'num_class': 2, # Always 2 - 'win' or 'lose'
-    'eta': [.01, .005, .015],
-}
-possibleCombos = 6*3*4*4*4*4
-with tqdm(total=possibleCombos) as progress_bar:
+# possibleCombos = (len(param_grid['max_depth']) * len(param_grid['learning_rate'])
+#                   * len(param_grid['n_estimators']) * len(param_grid['subsample'])
+#                   * len(param_grid['colsample_bytree']) * len(param_grid['split_date'])
+#                   * len(param_grid['min_child_weight']))
+with tqdm(total=len(all_params_combos)) as progress_bar:
     # Iterate over the grid
-    for max_depth in param_grid['max_depth']:
-        for learning_rate in param_grid['learning_rate']:
-            for n_estimators in param_grid['n_estimators']:
-                for subsample in param_grid['subsample']:
-                    for colsample_bytree in param_grid['colsample_bytree']:
-                        for min_child_weight in param_grid['min_child_weight']:
-                            progress_bar.set_description(f'md{max_depth}lr{learning_rate}es{n_estimators}ss{subsample}cb{colsample_bytree}cw{min_child_weight}')
-                            progress_bar.update(1)
-                            # Create and fit the model
-                            model = xgb.XGBClassifier(max_depth=max_depth, learning_rate=learning_rate, n_estimators=n_estimators, subsample=subsample, objective='binary:logistic')
-                            model.fit(x_train, y_train)
+    for params in all_params_combos:
 
-                            # Evaluate the model
-                            y_pred = model.predict(x_test)
-                            current_score = accuracy_score(y_test, y_pred)
+    # for max_depth in param_grid['max_depth']:
+    #     for learning_rate in param_grid['learning_rate']:
+    #         for n_estimators in param_grid['n_estimators']:
+    #             for subsample in param_grid['subsample']:
+    #                 for colsample_bytree in param_grid['colsample_bytree']:
+    #                     for split_date in param_grid['split_date']:
+        train_data = data[data['Date'] < params['split_date']]
+        test_data = data[data['Date'] >= params['split_date']]
 
-                            # Update the best model if current model is better
-                            if current_score > best_score:
-                                best_score = current_score
-                                best_params = {'max_depth': max_depth, 'learning_rate': learning_rate,
-                                               'n_estimators': n_estimators, 'subsample': subsample,
-                                               'colsample_bytree': colsample_bytree, 'min_child_weight': min_child_weight}
-                                model.save_model(f'../../Models/XGBoost_Model_{best_score*100}%_ML.json')
+        x_train = train_data.drop(['Home-Team-Win', 'Date'], axis=1)
+        y_train = train_data['Home-Team-Win']
+        x_test = test_data.drop(['Home-Team-Win', 'Date'], axis=1)
+        y_test = test_data['Home-Team-Win']
+                            # for min_child_weight in param_grid['min_child_weight']:
+                            #     progress_bar.set_description(f'md{max_depth}lr{learning_rate}es{n_estimators}ss{subsample}cb{colsample_bytree}cw{min_child_weight}')
 
-                                with open(f'../../Models/XGBoost_params_{best_score*100}%_ML.json', 'w') as f:
-                                    json.dump(best_params, f, indent=4)
+        model = xgb.XGBClassifier(max_depth=params['max_depth'],
+                                  learning_rate=params['learning_rate'],
+                                  n_estimators=params['n_estimators'],
+                                  subsample=params['subsample'],
+                                  colsample_bytree=params['colsample_bytree'],
+                                  min_child_weight=params['min_child_weight'],
+                                  objective='binary:logistic')
 
+        # Create and fit the model
+        model.fit(x_train, y_train)
 
+        # Evaluate the model
+        y_pred = model.predict(x_test)
+        current_score = accuracy_score(y_test, y_pred)
 
-# [CV 5/5] END colsample_bytree=0.6, learning_rate=0.01, max_depth=3, min_child_weight=4, n_estimators=200, subsample=0.7;, score=0.670 total time=   0.6s
+        # Update the best model if current model is better
+        if current_score > best_score:
+            best_score = current_score
 
-# [CV 5/5] END colsample_bytree=0.8, learning_rate=0.01, max_depth=3, min_child_weight=3, n_estimators=400, subsample=0.6;, score=0.668 total time=   1.2s
+            # Adjust the 'split_date' in params for JSON serialization
+            params_for_json = params.copy()
+            params_for_json['split_date'] = params['split_date'].strftime('%Y-%m-%d')
 
-# [CV 5/5] END colsample_bytree=0.7, learning_rate=0.01, max_depth=3, min_child_weight=1, n_estimators=300, subsample=0.6;, score=0.667 total time=   0.9s
-# [CV 5/5] END colsample_bytree=0.9, learning_rate=0.01, max_depth=3, min_child_weight=4, n_estimators=400, subsample=0.8;, score=0.667 total time=   1.3s
+            best_params = params
+            # {'max_depth': max_depth, 'learning_rate': learning_rate,
+            #                'n_estimators': n_estimators, 'subsample': subsample,
+            #                'colsample_bytree': colsample_bytree, 'min_child_weight': min_child_weight,
+            #                'split_date': split_date.strftime('%Y-%m-%d %H:%M:%S')}
+            model.save_model(f'../../Models/XGBoost_Model_{best_score*100}%_ML.json')
+            best_model = model
+            with open(f'../../Models/XGBoost_params_{best_score*100}%_ML.json', 'w') as f:
+                json.dump(params_for_json, f, indent=4)
 
-# [CV 5/5] END colsample_bytree=0.9, learning_rate=0.05, max_depth=3, min_child_weight=3, n_estimators=100, subsample=0.6;, score=0.665 total time=   0.3s
-# [CV 5/5] END colsample_bytree=0.7, learning_rate=0.05, max_depth=3, min_child_weight=4, n_estimators=200, subsample=0.6;, score=0.665 total time=   0.6s
-#
-#
-#
-#
-
-
-
-
+            progress_bar.set_description(f'Current Best Score: {round(best_score*100,1)}')
+        progress_bar.update(1)
 
 # Print the best parameters and best score
 print("Final Best Parameters:", best_params)
 print("Final Best Score:", best_score)
-
-# Evaluate the best model on the test set
-y_pred = best_model.predict(x_test)
-print("Test Set Accuracy:", accuracy_score(y_test, y_pred))
-
-# Save the best model
-best_model.save_model(best_model_so_far)
