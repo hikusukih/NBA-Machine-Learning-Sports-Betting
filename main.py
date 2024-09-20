@@ -43,7 +43,7 @@ def createTodaysGames(games, df, odds):
             away_team_odds.append(game_odds[away_team]['money_line_odds'])
 
         else:
-            todays_games_uo.append(input(home_team + ' vs ' + away_team + ': '))
+            todays_games_uo.append(input(home_team + ' vs ' + away_team + ' UnderOver: '))
 
             home_team_odds.append(input(home_team + ' odds: '))
             away_team_odds.append(input(away_team + ' odds: '))
@@ -105,6 +105,11 @@ def main(date):
                 home_team, away_team = g.split(":")
                 print(f"{away_team} ({odds[g][away_team]['money_line_odds']}) @ {home_team} ({odds[g][home_team]['money_line_odds']})")
     else:
+        # If -t is specified without -odds, and the date is not today, issue a warning.
+        today_date = datetime.today().strftime("%Y-%m-%d")
+        if args.date != today_date:
+            print(Fore.RED + f"Warning: Odds data is only available for 'today'. Your selected date '{date}' will be ignored." + Style.RESET_ALL)
+
         data = get_todays_games_json(todays_games_url)
         games = create_todays_games(data)
     data = get_json_data(data_url)

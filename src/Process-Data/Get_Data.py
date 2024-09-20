@@ -41,38 +41,52 @@ count = 0
 
 con = sqlite3.connect("../../Data/teams.sqlite")
 
-for iter_season in tqdm(season):
-    for iter_month in tqdm(month):
-        if iter_month == 1:
-            count += 1
-            end_year_pointer = year[count]
-        for iter_day in tqdm(days):
-            # No games before October 24
-            if iter_month == 10 and iter_day < 24:
-                continue
-            # 30 days hath september, april, june, november
-            if iter_month in [4, 6, 9, 11] and iter_day > 30:
-                continue
-            # February - This is for a leap year
-            if iter_month == 2 and iter_day > 29:
-                continue
-            # Don't get game data about "today"
-            if end_year_pointer == datetime.now().year:
-                if iter_month == datetime.now().month and iter_day > datetime.now().day:
-                    continue
-                if iter_month > datetime.now().month:
-                    continue
+with tqdm(total=len(season)) as pb_season:
+    for iter_season in season:
+        pb_season.set_description(f"Season: {iter_season}")
+        with tqdm(total=len(month)) as pb_month:
+            for iter_month in month:
+                pb_month.set_description(f"Months")
+                if iter_month == 1:
+                    count += 1
+                    end_year_pointer = year[count]
+                with tqdm(total=len(days)) as pb_day:
+                    for iter_day in days:
+                        pb_day.set_description(f"{year[count]}-{iter_month:02}-{iter_day:02}")
+                        # No games before October 24
+                        if iter_month == 10 and iter_day < 24:
+                            pb_day.update(1)
+                            continue
+                        # 30 days hath september, april, june, november
+                        if iter_month in [4, 6, 9, 11] and iter_day > 30:
+                            pb_day.update(1)
+                            continue
+                        # February - This is for a leap year
+                        if iter_month == 2 and iter_day > 29:
+                            pb_day.update(1)
+                            continue
+                        # Don't pget game data about "today"
+                        if end_year_pointer == datetime.now().year:
+                            if iter_month == datetime.now().month and iter_day > datetime.now().day:
+                                pb_day.update(1)
+                                continue
+                            if iter_month > datetime.now().month:
+                                pb_day.update(1)
+                                continue
 
-            general_data = get_json_data(url.format(iter_month, iter_day, begin_year_pointer, end_year_pointer, iter_season))
-            general_df = to_data_frame(general_data)
-            real_date = date(year=end_year_pointer, month=iter_month, day=iter_day) + timedelta(days=1)
-            general_df['Date'] = str(real_date)
+                        # general_data = get_json_data(url.format(iter_month, iter_day, begin_year_pointer, end_year_pointer, iter_season))
+                        # general_df = to_data_frame(general_data)
+                        # real_date = date(year=end_year_pointer, month=iter_month, day=iter_day) + timedelta(days=1)
+                        # general_df['Date'] = str(real_date)
+                        #
+                        # x = str(real_date).split('-')
+                        # general_df.to_sql(f"teams_{iter_season}-{str(int(x[1]))}-{str(int(x[2]))}", con, if_exists="replace")
 
-            x = str(real_date).split('-')
-            general_df.to_sql(f"teams_{iter_season}-{str(int(x[1]))}-{str(int(x[2]))}", con, if_exists="replace")
-
-            # Rest a while, randomize the requests
-            time.sleep(random.randint(2, 4))
-    begin_year_pointer = year[count]
+                        # Rest a while, randomize the requests
+                        # time.sleep(random.randint(2, 4))
+                        pb_day.update(1)
+                pb_month.update(1)
+        begin_year_pointer = year[count]
+        pb_season.update(1)
 
 con.close()

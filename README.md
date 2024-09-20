@@ -74,9 +74,6 @@ cd ../Train-Models
 python -m XGBoost_Model_ML
 python -m XGBoost_Model_UO
 ```
-Get_Data : go to NBA.com and get data
-Get_Odds_Data: go to Sportsbook Review and find historical odds
-Create_Games : 
 
 ## Contributing
 

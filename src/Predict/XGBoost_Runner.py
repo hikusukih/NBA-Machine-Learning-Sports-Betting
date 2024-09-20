@@ -50,9 +50,9 @@ def xgb_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team
 
     count = 0
     for game in games:
-        print(f'>>>XGBoost_Runner>>> game: {game}')
-        print(f'>>>XGBoost_Runner>>> data[count]: {data[count]}')
-        print(f'>>>XGBoost_Runner>>> ml_predictions_array[count]: {ml_predictions_array[count]}')
+        # print(f'>>>XGBoost_Runner>>> game: {game}')
+        # print(f'>>>XGBoost_Runner>>> data[count]: {data[count]}')
+        # print(f'>>>XGBoost_Runner>>> ml_predictions_array[count]: {ml_predictions_array[count]}')
         csv_output_array[count]['home_team_odds'] = home_team_odds[count]
         csv_output_array[count]['home_team_name'] = game[0]
         csv_output_array[count]['away_team_name'] = game[1]
