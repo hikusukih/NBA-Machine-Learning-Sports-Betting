@@ -11,6 +11,32 @@ from tqdm import tqdm
 sys.path.insert(1, os.path.join(sys.path[0], '../..'))
 from src.Utils.tools import get_json_data, to_data_frame
 
+"""
+This script is responsible for **gathering NBA team statistics** from the NBA stats API
+and storing the data in an SQLite database.
+
+Attributes:
+    url (str): The URL template for scraping NBA team statistics.
+    year (list): List of years to scrape.
+    season (list): List of NBA seasons (formatted as strings) to scrape.
+    month (list): List of months (October through June) to iterate over in each NBA season.
+    days (list): List of days (1-31) to iterate through for each month.
+    begin_year_pointer (int): Tracks the starting year in the current iteration.
+    end_year_pointer (int): Tracks the ending year in the current iteration.
+    count (int): Counter for advancing through years in the iteration.
+
+Database:
+    - The scraped data is stored in an SQLite database, with table names in the format `teams_{season}-{month}-{day}`.
+
+Flow:
+    1. **Initialize**: Set up the database connection and the iteration variables.
+    2. **Gather Data**: Loop over seasons, months, and days to collect the raw data.
+    3. **Store Data**: Insert the collected data into an SQLite database.
+    4. **Close**: Ensure the database connection is properly closed after the data collection is complete.
+
+Note: This script uses the `tqdm` library to display progress bars for the season, month, and day iterations.
+"""
+
 
 url = 'https://stats.nba.com/stats/' \
       'leaguedashteamstats?Conference=&' \
@@ -41,6 +67,7 @@ count = 0
 
 con = sqlite3.connect("../../Data/teams.sqlite")
 
+# // Iterate through all seasons/years/months/days. "pb_" stands for "progress bar"
 with tqdm(total=len(season)) as pb_season:
     for iter_season in season:
         pb_season.set_description(f"Season: {iter_season}")
@@ -65,7 +92,7 @@ with tqdm(total=len(season)) as pb_season:
                         if iter_month == 2 and iter_day > 29:
                             pb_day.update(1)
                             continue
-                        # Don't pget game data about "today"
+                        # Don't get game data about "today"
                         if end_year_pointer == datetime.now().year:
                             if iter_month == datetime.now().month and iter_day > datetime.now().day:
                                 pb_day.update(1)
@@ -74,19 +101,19 @@ with tqdm(total=len(season)) as pb_season:
                                 pb_day.update(1)
                                 continue
 
-                        # general_data = get_json_data(url.format(iter_month, iter_day, begin_year_pointer, end_year_pointer, iter_season))
-                        # general_df = to_data_frame(general_data)
-                        # real_date = date(year=end_year_pointer, month=iter_month, day=iter_day) + timedelta(days=1)
-                        # general_df['Date'] = str(real_date)
-                        #
-                        # x = str(real_date).split('-')
-                        # general_df.to_sql(f"teams_{iter_season}-{str(int(x[1]))}-{str(int(x[2]))}", con, if_exists="replace")
+                        url_formatted = url.format(iter_month, iter_day, begin_year_pointer, end_year_pointer, iter_season)
+                        general_data = get_json_data(url_formatted)
+                        general_df = to_data_frame(general_data)
+                        real_date = date(year=end_year_pointer, month=iter_month, day=iter_day) + timedelta(days=1)
+                        general_df['Date'] = str(real_date)
+
+                        x = str(real_date).split('-')
+                        general_df.to_sql(f"teams_{iter_season}-{str(int(x[1]))}-{str(int(x[2]))}", con, if_exists="replace")
 
                         # Rest a while, randomize the requests
-                        # time.sleep(random.randint(2, 4))
+                        time.sleep(random.randint(2, 4))
                         pb_day.update(1)
                 pb_month.update(1)
         begin_year_pointer = year[count]
         pb_season.update(1)
-
 con.close()
