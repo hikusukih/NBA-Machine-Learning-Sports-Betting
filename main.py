@@ -133,7 +133,7 @@ def main(date):
         NN_Runner.nn_runner(data, todays_games_uo, frame_ml, games, home_team_odds, away_team_odds, args.kc, date)
         print("-------------------------------------------------------")
 
-
+# Primary entry for generating odds. Select the model, sportsbook, and date.
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Model to Run')
     parser.add_argument('-xgb', action='store_true', help='Run with XGBoost Model')
