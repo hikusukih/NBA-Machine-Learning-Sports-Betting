@@ -1,5 +1,5 @@
 import mlflow
-
+import time
 from Predict.ModelManager import ModelManager
 from Predict.XGBModel001 import XGBModel001
 from Predict.NNModel001 import NNModel001
@@ -7,6 +7,10 @@ from ProcessData.DataProcessor import DataProcessor
 
 
 def main():
+    # Set up MLflow experiment
+    mlflow.set_tracking_uri("http://127.0.0.1:8765")
+    mlflow.set_experiment("NBA Game Prediction")
+
     # Initialize DataProcessor
     data_processor = DataProcessor("../Data/dataset.sqlite")
     data_processor.load_data()
@@ -15,7 +19,7 @@ def main():
     # Split the data
     X_train, X_test, y_train, y_test = data_processor.split_data()
 
-    print("Data split")
+    print("Data split.")
 
     # Initialize ModelManager
     manager = ModelManager()
@@ -26,9 +30,6 @@ def main():
 
     manager.add_model(xgb_model)
     manager.add_model(nn_model)
-
-    # Set up MLflow experiment
-    mlflow.set_experiment("NBA Game Prediction")
 
     print("Begin training:")
     # Train all models
@@ -44,5 +45,8 @@ def main():
     for model_name, accuracy in results.items():
         print(f"{model_name} Accuracy: {accuracy:.4f}")
 
+
 if __name__ == "__main__":
+    start_time = time.time()
     main()
+    print("--- %s seconds ---" % (time.time() - start_time))
