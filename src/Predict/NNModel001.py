@@ -1,10 +1,13 @@
-import BaseModel
+
 import mlflow
 from sklearn.neural_network import MLPClassifier
 
-class NeuralNetworkModel(BaseModel):
+from Predict.BaseModel import BaseModel
+
+
+class NNModel001(BaseModel):
     def __init__(self, params):
-        super().__init__("neural_network_model")
+        super().__init__("NNModel001")
         self.params = params
 
     def train(self, X_train, y_train):

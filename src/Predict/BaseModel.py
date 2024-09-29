@@ -15,4 +15,5 @@ class BaseModel(ABC):
         pass
 
     def log_model(self):
-        mlflow.log_model(self.model, self.model_name)
+        # mlflow.pyfunc.log_model(self.model, self.model_name)
+        pass

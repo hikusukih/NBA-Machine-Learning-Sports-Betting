@@ -1,22 +1,21 @@
 import mlflow
-import xgboost as xgb
+
 from Predict.ModelManager import ModelManager
 from Predict.XGBModel001 import XGBModel001
-from ProcessData.DataProcessing import DataProcessor
-
-
-class NNModel001:
-    pass
+from Predict.NNModel001 import NNModel001
+from ProcessData.DataProcessor import DataProcessor
 
 
 def main():
     # Initialize DataProcessor
-    data_processor = DataProcessor('nba_game_data.csv')
+    data_processor = DataProcessor("../Data/dataset.sqlite")
     data_processor.load_data()
     data_processor.preprocess_data()
 
     # Split the data
     X_train, X_test, y_train, y_test = data_processor.split_data()
+
+    print("Data split")
 
     # Initialize ModelManager
     manager = ModelManager()
@@ -31,11 +30,15 @@ def main():
     # Set up MLflow experiment
     mlflow.set_experiment("NBA Game Prediction")
 
+    print("Begin training:")
     # Train all models
     manager.train_all_models(X_train, y_train)
+    print("Training complete.")
 
+    print("Begin evaluation:")
     # Evaluate models
     results = manager.evaluate_models(X_test, y_test)
+    print("Evaluation complete.")
 
     # Print results
     for model_name, accuracy in results.items():

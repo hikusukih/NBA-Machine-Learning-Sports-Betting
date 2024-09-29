@@ -1,7 +1,8 @@
-import BaseModel
+
 import mlflow
 import xgboost as xgb
 
+from Predict.BaseModel import BaseModel
 
 
 class XGBModel001(BaseModel):
