@@ -15,14 +15,21 @@ Note that a popular, less risky approach is to bet 50% of the stake recommended 
 
 Use Python 3.11. In particular the packages/libraries used are...
 
-* Tensorflow - Machine learning library
-* XGBoost - Gradient boosting framework
-* Numpy - Package for scientific computing in Python
-* Pandas - Data manipulation and analysis
-* Colorama - Color text output
-* Tqdm - Progress bars
-* Requests - Http library
-* Scikit_learn - Machine learning library
+* Python
+  * Pandas - Data manipulation and analysis
+  * Numpy - Package for scientific computing in Python
+  * Requests - Http library
+* Machine Learning
+  * Tensorflow - Machine learning library
+  * XGBoost - Gradient boosting framework
+  * Scikit_learn - Machine learning library
+  * MLFlow - track models over time
+* Output
+  * Colorama - Color text output
+  * Tqdm - Progress bars
+  * Flask - Web UI for generated odds
+* Betting
+  * sbrscrape
 
 ## Usage
 
@@ -62,11 +69,12 @@ flask --debug run
 - Train Models
   - Money-Line
   - Under-Over
+- Make predictions about today's games
 
-## Getting new data and training models
+### Getting new data and training models
 ```
 # Create dataset with the latest data for 2023-24 season
-cd src/Process-Data
+cd src/ProcessData
 python -m Get_Data
 python -m Get_Odds_Data
 python -m Create_Games
@@ -104,11 +112,17 @@ TQDM: Adds a progress bar to iterables in the console output
 - Any 0 KC gets the same rank as the lowest value (so i always bet every one)
 
 # Open Terminals
+- **Jupyter**
+  - ~~py -m jupyterlab~~
+  - `jupyter notebook`
+- **ml-flow server**
+  - `cd mlflow; python -m mlflow server --host 127.0.0.1 --port 8765`
 - **RunModel**
-  - $ python main.py -xgb -odds=fanduel 
+  - `python main.py -xgb -odds=fanduel` 
     - `-t` for "tomorrow"
-  - $ python -m Get_Data; python -m Get_Odds_Data; python -m Create_Games
+  - `python -m Get_Data; python -m Get_Odds_Data; python -m Create_Games`
 - **Hyperparam Search**
-  - cd src/Train-Models ; python Hyperparam_XGBoost_ML.py ;
-- **JupyterLab**
-  - py -m jupyterlab
+  - `cd src/Train-Models; python Hyperparam_XGBoost_ML.py;`
+
+# TODO
+- `main.py` - rather than ask data.NBA.com what games are happening today, pull from your own knowledge of what games exist
