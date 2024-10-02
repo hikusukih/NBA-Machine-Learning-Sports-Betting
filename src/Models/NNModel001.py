@@ -2,7 +2,7 @@
 import mlflow
 from sklearn.neural_network import MLPClassifier
 
-from Predict.BaseModel import BaseModel
+from Models.BaseModel import BaseModel
 
 
 class NNModel001(BaseModel):
@@ -19,3 +19,6 @@ class NNModel001(BaseModel):
 
     def predict(self, X_test):
         return self.model.predict(X_test)
+
+    def log_model(self):
+        mlflow.sklearn.log_model(self.model, "neuralnet_001_model")

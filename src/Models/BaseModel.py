@@ -7,13 +7,15 @@ class BaseModel(ABC):
         self.model = None
 
     @abstractmethod
-    def train(self, X_train, y_train):
+    def train(self, x_train, y_train):
         pass
 
     @abstractmethod
-    def predict(self, X_test):
+    def predict(self, x_test):
         pass
 
+    @abstractmethod
     def log_model(self):
-        # mlflow.pyfunc.log_model(self.model, self.model_name)
         pass
+        # mlflow.pyfunc.log_model(self.model, self.model_name)
+        mlflow.sklearn.log_model(self.model, "model")

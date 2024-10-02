@@ -1,8 +1,11 @@
-
 import mlflow
 import xgboost as xgb
 
-from Predict.BaseModel import BaseModel
+from Models.BaseModel import BaseModel
+
+'''
+This is a basic, dumb model for proof-of-concept with comparing different models.
+'''
 
 
 class XGBModel001(BaseModel):
@@ -17,5 +20,8 @@ class XGBModel001(BaseModel):
             mlflow.log_params(self.params)
             self.log_model()
 
-    def predict(self, X_test):
-        return self.model.predict(X_test)
+    def predict(self, x_test):
+        return self.model.predict(x_test)
+
+    def log_model(self):
+        mlflow.xgboost.log_model(self.model, self.model_name)
