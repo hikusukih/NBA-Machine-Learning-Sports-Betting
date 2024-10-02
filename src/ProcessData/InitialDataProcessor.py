@@ -1,11 +1,17 @@
 import pandas as pd
-import numpy as np
 import sqlite3
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 
-class DataProcessor:
+
+class InitialDataProcessor:
+    """
+    This delivers the data in its least processed form.
+     Downstream "DataCuts" will filter this down.
+    """
+
     def __init__(self, data_path):
         self.data_path = data_path
         self.data = None
@@ -47,4 +53,11 @@ class DataProcessor:
         print("Data preprocessed.")
 
     def split_data(self, test_size=0.2, random_state=42):
+        print(self.y.shape) # Should be a one-dimenaional array with shape (2959,)
+
+        # Ensure self.y is a single-column array or series
+        if isinstance(self.y, pd.DataFrame):
+            self.y = self.y.iloc[:, 0]  # Select the first column if y is a DataFrame
+
+
         return train_test_split(self.X, self.y, test_size=test_size, random_state=random_state)
