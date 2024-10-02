@@ -1,9 +1,11 @@
 import mlflow
 import time
-from Predict.ModelManager import ModelManager
-from Predict.XGBModel001 import XGBModel001
-from Predict.NNModel001 import NNModel001
-from ProcessData.DataProcessor import DataProcessor
+from Models.ModelManager import ModelManager
+from Models.MoneyLineNeuralNetModel001 import MoneyLineNeuralNetModel001
+from Models.XGBModel001 import XGBModel001
+from Models.NNModel001 import NNModel001
+from ProcessData.InitialDataProcessor import InitialDataProcessor
+# from data_cuts.all_available_data import AllAvailableData
 
 
 def main():
@@ -12,33 +14,42 @@ def main():
     mlflow.set_experiment("NBA Game Prediction")
 
     # Initialize DataProcessor
-    data_processor = DataProcessor("../Data/dataset.sqlite")
+    data_processor = InitialDataProcessor("../Data/dataset.sqlite")
     data_processor.load_data()
     data_processor.preprocess_data()
 
     # Split the data
-    X_train, X_test, y_train, y_test = data_processor.split_data()
+    x_train, x_test, y_train, y_test = data_processor.split_data()
+    print("x_train shape:", x_train.shape)
+    print("x_test shape:", x_test.shape)
+    print("y_train shape:", y_train.shape)
+    print("y_test shape:", y_test.shape)
 
     print("Data split.")
 
     # Initialize ModelManager
     manager = ModelManager()
 
+    # data_cuts = {}
+    # data_cuts["all"] = AllAvailableData()
+
     # Add different models
     xgb_model = XGBModel001(params={'n_estimators': 100, 'max_depth': 3, 'learning_rate': 0.1})
     nn_model = NNModel001(params={'hidden_layer_sizes': (100, 50), 'max_iter': 500, 'alpha': 0.0001})
+    og_nn_model = MoneyLineNeuralNetModel001(params={'data_cut_name': 'All Data'})
 
+    manager.add_model(og_nn_model)
     manager.add_model(xgb_model)
     manager.add_model(nn_model)
 
     print("Begin training:")
     # Train all models
-    manager.train_all_models(X_train, y_train)
+    manager.train_all_models(x_train, y_train)
     print("Training complete.")
 
     print("Begin evaluation:")
     # Evaluate models
-    results = manager.evaluate_models(X_test, y_test)
+    results = manager.evaluate_models(x_test, y_test)
     print("Evaluation complete.")
 
     # Print results
