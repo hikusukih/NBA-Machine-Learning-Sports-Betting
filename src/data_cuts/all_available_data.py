@@ -1,21 +1,22 @@
 # data_cuts/full_season_cut.py
 from data_cuts.base_data_cut import BaseDataCut
+from sklearn.model_selection import train_test_split
+
 
 class AllAvailableData(BaseDataCut):
-    def __init__(self):
-        self.season = season
-
-    def get_name(self):
-        return f"All Available Data"
+    def __init__(self, feature_data, label_data, test_size, random_state, data_cut_name="All Available Data"):
+        super().__init__(feature_data, label_data, test_size, random_state, data_cut_name)
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
+            feature_data, label_data, test_size=test_size, random_state=random_state)
 
     def get_x_train_data(self):
-        pass
+        return self.x_train
 
     def get_x_test_data(self):
-        pass
+        return self.x_test
 
     def get_y_train_data(self):
-        pass
+        return self.y_train
 
     def get_y_test_data(self):
-        pass
+        return self.y_test
