@@ -1,4 +1,6 @@
 # data_cuts/full_season_cut.py
+import mlflow
+
 from data_cuts.base_data_cut import BaseDataCut
 from sklearn.model_selection import train_test_split
 
@@ -19,3 +21,6 @@ class AllAvailableData(BaseDataCut):
 
     def get_y_test_data(self):
         return self.y_test
+
+    def log_mlflow(self):
+        mlflow.log_param("data_cut_name", self.get_name())

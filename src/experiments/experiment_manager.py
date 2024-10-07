@@ -12,6 +12,8 @@ class ExperimentManager:
         self.models = {}
         self.data_cuts = {}
         self.experiments = {}
+        mlflow.set_tracking_uri("http://127.0.0.1:8765")
+        mlflow.set_experiment("NBA Game Prediction")
 
     def add_experiment(self, p_model, p_data_cut):
         """
@@ -50,8 +52,10 @@ class ExperimentManager:
         self.data_cuts[p_data_cut.get_name()] = p_data_cut
 
     def train_and_evaluate_defined_experiments(self):
-        """
-        Iterate through the experiments and run them all
+        """Iterate through the experiments and run them all
+
+        implement next...
+
         :return:
         """
         pass
@@ -79,6 +83,7 @@ class ExperimentManager:
                 accuracy_list.append(accuracy)
                 # results[model.get_name() + ] = accuracy
                 mlflow.log_metric(f"accuracy_{model.get_name()}_{dc.get_name()}", accuracy)
+                mlflow.log_metric("accuracy", accuracy)
                 mlflow.end_run()
 
             average_accuracy = sum(accuracy_list) / len(accuracy_list)

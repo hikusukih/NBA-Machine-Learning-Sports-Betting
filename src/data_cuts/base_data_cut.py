@@ -8,18 +8,21 @@ class BaseDataCut(ABC):
                  feature_data: pd.DataFrame,
                  label_data: pd.Series,
                  test_size: float,
-                 random_state: Any,
-                 data_cut_name: str):
+                 random_state: Any):
         """
         Initialize DataCut.
+
         :param feature_data: pd.DataFrame - Features to train on, shape (n_samples, n_features)
         :param label_data: pd.Series - Labels coinciding with the features, shape (n_samples,)
         :param test_size: float - Fraction of data to use as test data
         :param random_state: Any - Random state for reproducibility
-        :param data_cut_name: str - The name of this instance
         """
 
     def get_name(self) -> str:
+        """Get a descriptive name for this DataCut
+
+        :return str - The name of this instance
+        """
         pass
 
     @abstractmethod
@@ -57,4 +60,3 @@ class BaseDataCut(ABC):
     @abstractmethod
     def log_mlflow(self):
         pass
-    

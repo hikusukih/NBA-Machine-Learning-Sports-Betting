@@ -15,16 +15,18 @@ class BaseModel(ABC):
     def train(self, x_train: pd.DataFrame, y_train: pd.Series) -> None:
         """
         Train the model on the given training data
+
         :param x_train: pd.DataFrame - Training data features, shape (n_samples, n_features)
         :param y_train: pd.Series - Training data labels, shape (n_samples,)
+
         :return: None
         """
         pass
 
     @abstractmethod
-    def predict(self, x_test: pd.Series) -> pd.Series:
-        """
-        Apply the model to this test data
+    def predict(self, x_test: pd.DataFrame) -> pd.Series:
+        """Apply the model to this test data
+
         :param x_test: pd.Series - Input test data, shape (n_samples,)
         :return: pd.Series - Results of applying the model, shape (n_samples,)
         """
