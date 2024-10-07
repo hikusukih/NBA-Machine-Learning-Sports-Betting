@@ -1,14 +1,22 @@
 from abc import ABC, abstractmethod
+import pandas as pd
+from typing import Any
 
 
 class BaseDataCut(ABC):
-
-    def __init__(self, feature_data, label_data, test_size, random_state, data_cut_name):
+    def __init__(self,
+                 feature_data: pd.DataFrame,
+                 label_data: pd.Series,
+                 test_size: float,
+                 random_state: Any,
+                 data_cut_name: str):
         """
-        Initialize DataCut. Select which data does what here.
-        :param feature_data: Features to train on
-        :param label_data: Labels coinciding with the features
-        :param data_cut_name: The name of this instance
+        Initialize DataCut.
+        :param feature_data: pd.DataFrame - Features to train on, shape (n_samples, n_features)
+        :param label_data: pd.Series - Labels coinciding with the features, shape (n_samples,)
+        :param test_size: float - Fraction of data to use as test data
+        :param random_state: Any - Random state for reproducibility
+        :param data_cut_name: str - The name of this instance
         """
         self.random_state = random_state
         self.test_size = test_size
@@ -16,21 +24,37 @@ class BaseDataCut(ABC):
         self.feature_data = feature_data
         self.label_data = label_data
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.name
 
     @abstractmethod
-    def get_x_train_data(self):
+    def get_x_train_data(self) -> pd.DataFrame:
+        """
+        Get the training features data
+        :return: pd.DataFrame - Training features, shape (n_samples_train, n_features)
+        """
         pass
 
     @abstractmethod
-    def get_x_test_data(self):
+    def get_x_test_data(self) -> pd.DataFrame:
+        """
+        Get the testing features data
+        :return: pd.DataFrame - Testing features, shape (n_samples_test, n_features)
+        """
         pass
 
     @abstractmethod
     def get_y_train_data(self):
+        """
+        Get the training labels data
+        :return: pd.Series - Training labels, shape (n_samples_train,)
+        """
         pass
 
     @abstractmethod
     def get_y_test_data(self):
+        """
+        Get the testing labels data
+        :return: pd.Series - Training labels, shape (n_samples_train,)
+        """
         pass

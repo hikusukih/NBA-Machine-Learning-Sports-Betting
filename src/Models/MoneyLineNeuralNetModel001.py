@@ -1,3 +1,5 @@
+import os
+
 import mlflow
 import time
 import numpy as np
@@ -13,8 +15,7 @@ class MoneyLineNeuralNetModel001(BaseModel):
     The MoneyLine model that came with the code
     """
     def __init__(self,params):
-        self.model_name = 'MoneyLineNeuralNetModel001'
-        self.model = None
+        super().__init__('MoneyLineNeuralNetModel001')
         self.params = params
 
     def train(self, x_train, y_train):
@@ -22,20 +23,20 @@ class MoneyLineNeuralNetModel001(BaseModel):
             current_time = str(time.time())
 
             tensorboard = TensorBoard(log_dir='../../Logs/{}'.format(current_time))
-            early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
+            early_stopping = EarlyStopping(monitor='val_loss', patience=20, verbose=0, mode='min')
 
-            model_path = '../../Models/NN_Models/'
+            model_output_path = '../../Models/NN_Models/'
             # model_filename = 'Trained-Model-MoneyLine-' + current_time + '.kerasext'
-            model_best_accuracy_filename = model_path + 'Model-MoneyLine-Most-Accuracy.h5'
-            model_least_loss_filename = model_path + 'Model-MoneyLine-Least-Loss.h5'
+            model_best_accuracy_filename = model_output_path + 'Model-MoneyLine-Most-Accuracy.h5'
+            model_least_loss_filename = model_output_path + 'Model-MoneyLine-Least-Loss.h5'
 
             # mcp_save = ModelCheckpoint(
-            #     model_path + model_filename,
+            #     model_output_path + model_filename,
             #     save_best_only=True, monitor='val_loss', mode='min')
 
             # Checkpoint for the model with the best accuracy
             accuracy_checkpoint = ModelCheckpoint(
-                model_path + model_best_accuracy_filename,
+                model_best_accuracy_filename,
                 monitor='val_accuracy',
                 mode='max',
                 save_best_only=True,
@@ -44,12 +45,12 @@ class MoneyLineNeuralNetModel001(BaseModel):
 
             # Checkpoint for the model with the lowest loss
             loss_checkpoint = ModelCheckpoint(
-                model_path + model_least_loss_filename,
+                model_least_loss_filename,
                 monitor='val_loss',
                 mode='min',
                 save_best_only=True,
                 verbose=1
-)
+            )
 
             self.model = tf.keras.models.Sequential([
                 tf.keras.layers.Flatten(input_shape=(x_train.shape[1],)),
@@ -64,9 +65,12 @@ class MoneyLineNeuralNetModel001(BaseModel):
             model_summary = []
             self.model.summary(print_fn=lambda x: model_summary.append(x))
             model_summary_str = "\n".join(model_summary)
-            with open("model_summary.txt", "w") as f:
+            print(os.getcwd())
+            model_summary_path = "../out/temp/model_summary.txt"
+            with open(model_summary_path, "w") as f:
                 f.write(model_summary_str)
-            mlflow.log_artifact("model_summary.txt")  # Log the summary as an artifact
+            print(os.path.abspath(f.name))
+            mlflow.log_text(model_summary_str, artifact_file=os.path.abspath(f.name))  # Log the summary as an artifact
 
             # Log parameters
             mlflow.log_params(self.params)  # Log initial parameters
@@ -74,7 +78,7 @@ class MoneyLineNeuralNetModel001(BaseModel):
             mlflow.log_param("batch_size", 32)  # Example fixed parameter
             mlflow.log_param("epochs", 50)  # Example fixed parameter
 
-            # Train the model with logging
+            # Train the model, logging along the way
             history = self.model.fit(x_train, y_train, epochs=50, validation_split=0.1, batch_size=32,
                            callbacks=[tensorboard, early_stopping, accuracy_checkpoint, loss_checkpoint])
 
@@ -86,13 +90,14 @@ class MoneyLineNeuralNetModel001(BaseModel):
                 mlflow.log_metric("val_accuracy", history.history['val_accuracy'][epoch], step=epoch)
 
             # Save the final model as an artifact
-            self.model.save(f"final_model_{self.model_name}.h5")
-            mlflow.log_artifact(f"final_model_{self.model_name}.h5")
+            model_final_filename = f"../out/temp/final_model_{self.model_name}.h5"
+
+            self.model.save(model_final_filename)
+            mlflow.log_artifact(model_final_filename)
             mlflow.log_artifact(model_least_loss_filename)
             mlflow.log_artifact(model_best_accuracy_filename)
     def predict(self, x_test):
-        print( x_test.shape)
-        return self.model.predict(x_test)
+        return np.argmax(self.model.predict(x_test), axis=1)
 
     def log_model(self):
         mlflow.sklearn.log_model(self.model, self.model_name)

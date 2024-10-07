@@ -1,6 +1,9 @@
 import mlflow
 from mlflow.tracking import MlflowClient
 
+from Models.BaseModel import BaseModel
+from data_cuts.base_data_cut import BaseDataCut
+
 
 class DataModelExperiment:
     def __init__(self, experiment_name):
@@ -8,15 +11,22 @@ class DataModelExperiment:
         self.client = MlflowClient()
 
     def run_experiment(self, model, data_cut, params):
-        with mlflow.start_run():
+        if not isinstance(input, BaseModel):
+            raise TypeError(TypeError("Parameter [model] must be of type BaseModel"))
+        if not isinstance(input, BaseDataCut):
+            raise TypeError(TypeError("Parameter [data_cut] must be of type BaseDataCut"))
+
+        with ((mlflow.start_run())):
             mlflow.log_params(params)
-            mlflow.log_param("data_cut", data_cut.get_name())
+            mlflow.log_param("data_cut_type", data_cut.get_name())
 
-            X, y = data_cut.get_data()
-            X_train, X_test, y_train, y_test = self.preprocess_data(X, y)
+            x_train = data_cut.get_x_train_data()
+            x_test = data_cut.get_x_test_data()
+            y_train = data_cut.get_y_train_data()
+            y_test = data_cut.get_y_test_data()
 
-            model.train(X_train, y_train)
-            accuracy = model.evaluate(X_test, y_test)
+            model.train(x_train, y_train)
+            accuracy = model.evaluate(x_test, y_test)
 
             mlflow.log_metric("accuracy", accuracy)
             mlflow.sklearn.log_model(model, "model")

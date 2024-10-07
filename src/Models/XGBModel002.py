@@ -33,15 +33,37 @@ It's (in process of becoming) in the format of the 2024 way of comparing models
 class XGBModel002(BaseModel):
 
     def log_model(self):
-        mlflow.xgboost.logModel(self.model, "xgboost_002_model")
+        mlflow.xgboost.logModel(self.model, "xgboost_inherited_002_model")
         pass
 
     def __init__(self, params):
         super().__init__("XGBModel002")
-        self.params = params
+        self.params ={
+            "max_depth": 3,
+            "learning_rate": 0.1,
+            # "n_estimators": 200,
+            "subsample": 0.8,
+            "colsample_bytree": 0.6,
+            "min_child_weight": 4,
+            'eta': 0.01,
+            # 'n_estimators': 300,
+            'num_class': 2,
+            'objective': 'multi:softprob',
+
+            'tree_method': 'gpu_hist',
+            'epochs': 800
+        }
 
     def train(self, X_train, y_train):
+
         with mlflow.start_run(run_name=self.model_name):
+            ## in original, this all was looped "iterations" (3) times
+
+            train = xgb.DMatrix(X_train, label=y_train)
+            # test = xgb.DMatrix(x_test, label=y_test)
+
+            self.model = xgb.train(self.params, train, self.params['epochs'])
+
             self.model = xgb.XGBClassifier(**self.params)
             self.model.fit(X_train, y_train)
             mlflow.log_params(self.params)

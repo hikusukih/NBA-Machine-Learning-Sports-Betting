@@ -5,6 +5,10 @@ from Models.MoneyLineNeuralNetModel001 import MoneyLineNeuralNetModel001
 from Models.XGBModel001 import XGBModel001
 from Models.NNModel001 import NNModel001
 from ProcessData.InitialDataProcessor import InitialDataProcessor
+from data_cuts.all_available_data import AllAvailableData
+from experiments.experiment_manager import ExperimentManager
+
+
 # from data_cuts.all_available_data import AllAvailableData
 
 
@@ -25,10 +29,16 @@ def main():
     print("y_train shape:", y_train.shape)
     print("y_test shape:", y_test.shape)
 
+    dc_all_data = AllAvailableData(feature_data=data_processor.X,
+                                label_data=data_processor.y,
+                                random_state=42,
+                                test_size=0.2)
+
     print("Data split.")
 
     # Initialize ModelManager
     manager = ModelManager()
+    mgr = ExperimentManager()
 
     # data_cuts = {}
     # data_cuts["all"] = AllAvailableData()
@@ -42,14 +52,20 @@ def main():
     manager.add_model(xgb_model)
     manager.add_model(nn_model)
 
+    mgr.add_model(og_nn_model)
+    mgr.add_model(xgb_model)
+    mgr.add_model(nn_model)
+    mgr.add_data_cut(dc_all_data)
+
     print("Begin training:")
     # Train all models
-    manager.train_all_models(x_train, y_train)
+    # manager.train_all_models(x_train, y_train)
+    results = mgr.train_and_evaluate_all_combinations()
     print("Training complete.")
 
     print("Begin evaluation:")
     # Evaluate models
-    results = manager.evaluate_models(x_test, y_test)
+    # results = manager.evaluate_models(x_test, y_test)
     print("Evaluation complete.")
 
     # Print results
