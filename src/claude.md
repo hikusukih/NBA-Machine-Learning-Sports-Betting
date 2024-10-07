@@ -170,8 +170,6 @@ Would you like me to elaborate on any specific part of this structure or provide
 
 Great question! Handling different cuts of data in a structured and comparable way is indeed an important aspect of machine learning experimentation. Your idea of using another abstract class is a good one. Let's expand our project structure to incorporate this concept.
 
-
-
 ```python
 # Add to the existing project structure:
 # project_root/
@@ -189,119 +187,131 @@ Great question! Handling different cuts of data in a structured and comparable w
 # data_cuts/base_data_cut.py
 from abc import ABC, abstractmethod
 
-class BaseDataCut(ABC):
-    @abstractmethod
-    def get_data(self):
-        pass
 
-    @abstractmethod
-    def get_name(self):
-        pass
+class BaseDataCut(ABC):
+   @abstractmethod
+   def get_data(self):
+      pass
+
+   @abstractmethod
+   def get_name(self):
+      pass
+
 
 # data_cuts/full_season_cut.py
 from data_cuts.base_data_cut import BaseDataCut
 
+
 class FullSeasonCut(BaseDataCut):
-    def __init__(self, season):
-        self.season = season
+   def __init__(self, season):
+      self.season = season
 
-    def get_data(self):
-        # Implementation to fetch full season data
-        pass
+   def get_data(self):
+      # Implementation to fetch full season data
+      pass
 
-    def get_name(self):
-        return f"Full_Season_{self.season}"
+   def get_name(self):
+      return f"Full_Season_{self.season}"
+
 
 # data_cuts/last_n_games_cut.py
 from data_cuts.base_data_cut import BaseDataCut
 
+
 class LastNGamesCut(BaseDataCut):
-    def __init__(self, n_games):
-        self.n_games = n_games
+   def __init__(self, n_games):
+      self.n_games = n_games
 
-    def get_data(self):
-        # Implementation to fetch last N games data
-        pass
+   def get_data(self):
+      # Implementation to fetch last N games data
+      pass
 
-    def get_name(self):
-        return f"Last_{self.n_games}_Games"
+   def get_name(self):
+      return f"Last_{self.n_games}_Games"
+
 
 # data_cuts/team_specific_cut.py
 from data_cuts.base_data_cut import BaseDataCut
 
+
 class TeamSpecificCut(BaseDataCut):
-    def __init__(self, team_name):
-        self.team_name = team_name
+   def __init__(self, team_name):
+      self.team_name = team_name
 
-    def get_data(self):
-        # Implementation to fetch team-specific data
-        pass
+   def get_data(self):
+      # Implementation to fetch team-specific data
+      pass
 
-    def get_name(self):
-        return f"Team_{self.team_name}"
+   def get_name(self):
+      return f"Team_{self.team_name}"
+
 
 # experiments/data_model_experiment.py
 import mlflow
 from mlflow.tracking import MlflowClient
 
+
 class DataModelExperiment:
-    def __init__(self, experiment_name):
-        mlflow.set_experiment(experiment_name)
-        self.client = MlflowClient()
+   def __init__(self, experiment_name):
+      mlflow.set_experiment(experiment_name)
+      self.client = MlflowClient()
 
-    def run_experiment(self, model, data_cut, params):
-        with mlflow.start_run():
-            mlflow.log_params(params)
-            mlflow.log_param("data_cut", data_cut.get_name())
-            
-            X, y = data_cut.get_data()
-            X_train, X_test, y_train, y_test = self.preprocess_data(X, y)
-            
-            model.train(X_train, y_train)
-            accuracy = model.evaluate(X_test, y_test)
-            
-            mlflow.log_metric("accuracy", accuracy)
-            mlflow.sklearn.log_model(model, "model")
+   def run_experiment(self, model, data_cut, params):
+      with mlflow.start_run():
+         mlflow.log_params(params)
+         mlflow.log_param("data_cut", data_cut.get_name())
 
-        return accuracy
+         X, y = data_cut.get_data()
+         X_train, X_test, y_train, y_test = self.preprocess_data(X, y)
 
-    def preprocess_data(self, X, y):
-        # Implement data preprocessing
-        # This could include train-test split, scaling, etc.
-        pass
+         model.train(X_train, y_train)
+         accuracy = model.evaluate(X_test, y_test)
+
+         mlflow.log_metric("accuracy", accuracy)
+         mlflow.sklearn.log_model(model, "model")
+
+      return accuracy
+
+   def preprocess_data(self, X, y):
+      # Implement data preprocessing
+      # This could include train-test split, scaling, etc.
+      pass
+
 
 # main.py (updated)
-from experiments.data_model_experiment import DataModelExperiment
+from experiments.data_model_experiment import ModelDataTrainingRun
 from models.xgboost_model import XGBoostModel
 from models.neural_network_model import NeuralNetworkModel
 from data_cuts.full_season_cut import FullSeasonCut
 from data_cuts.last_n_games_cut import LastNGamesCut
 from data_cuts.team_specific_cut import TeamSpecificCut
 
+
 def main():
-    # Set up experiment
-    experiment = DataModelExperiment("NBA_Game_Prediction")
+   # Set up experiment
+   experiment = ModelDataTrainingRun("NBA_Game_Prediction")
 
-    # Define models
-    xgb_model = XGBoostModel({'max_depth': 3, 'learning_rate': 0.1, 'n_estimators': 100})
-    nn_model = NeuralNetworkModel([64, 32, 1])
+   # Define models
+   xgb_model = XGBoostModel({'max_depth': 3, 'learning_rate': 0.1, 'n_estimators': 100})
+   nn_model = NeuralNetworkModel([64, 32, 1])
 
-    # Define data cuts
-    full_season = FullSeasonCut(2023)
-    last_20_games = LastNGamesCut(20)
-    lakers_specific = TeamSpecificCut("Lakers")
+   # Define data cuts
+   full_season = FullSeasonCut(2023)
+   last_20_games = LastNGamesCut(20)
+   lakers_specific = TeamSpecificCut("Lakers")
 
-    # Run experiments
-    models = [xgb_model, nn_model]
-    data_cuts = [full_season, last_20_games, lakers_specific]
+   # Run experiments
+   models = [xgb_model, nn_model]
+   data_cuts = [full_season, last_20_games, lakers_specific]
 
-    for model in models:
-        for data_cut in data_cuts:
-            accuracy = experiment.run_experiment(model, data_cut, model.get_params())
-            print(f"Model: {model.__class__.__name__}, Data Cut: {data_cut.get_name()}, Accuracy: {accuracy}")
+   for model in models:
+      for data_cut in data_cuts:
+         accuracy = experiment.train_and_evaluate(model, data_cut, model.get_params())
+         print(f"Model: {model.__class__.__name__}, Data Cut: {data_cut.get_name()}, Accuracy: {accuracy}")
+
 
 if __name__ == "__main__":
-    main()
+   main()
 
 ```
 

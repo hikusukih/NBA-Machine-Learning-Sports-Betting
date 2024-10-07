@@ -8,7 +8,6 @@ from ProcessData.InitialDataProcessor import InitialDataProcessor
 from data_cuts.all_available_data import AllAvailableData
 from experiments.experiment_manager import ExperimentManager
 
-
 # from data_cuts.all_available_data import AllAvailableData
 
 
@@ -40,22 +39,27 @@ def main():
     manager = ModelManager()
     mgr = ExperimentManager()
 
-    # data_cuts = {}
-    # data_cuts["all"] = AllAvailableData()
+    data_cuts = {}
+    data_cuts["all"] = AllAvailableData()
+
+    models = {}
+
 
     # Add different models
     xgb_model = XGBModel001(params={'n_estimators': 100, 'max_depth': 3, 'learning_rate': 0.1})
     nn_model = NNModel001(params={'hidden_layer_sizes': (100, 50), 'max_iter': 500, 'alpha': 0.0001})
     og_nn_model = MoneyLineNeuralNetModel001(params={'data_cut_name': 'All Data'})
 
+    models[xgb_model.get_name()] = xgb_model
+    models[nn_model.get_name()] = nn_model
+    models[og_nn_model.get_name()] = og_nn_model
+
+
+
     manager.add_model(og_nn_model)
     manager.add_model(xgb_model)
     manager.add_model(nn_model)
 
-    mgr.add_model(og_nn_model)
-    mgr.add_model(xgb_model)
-    mgr.add_model(nn_model)
-    mgr.add_data_cut(dc_all_data)
 
     print("Begin training:")
     # Train all models

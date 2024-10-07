@@ -4,8 +4,7 @@ from sklearn.model_selection import train_test_split
 
 
 class AllAvailableData(BaseDataCut):
-    def __init__(self, feature_data, label_data, test_size, random_state, data_cut_name="All Available Data"):
-        super().__init__(feature_data, label_data, test_size, random_state, data_cut_name)
+    def __init__(self, feature_data, label_data, test_size, random_state, data_cut_name="all_available_data"):
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
             feature_data, label_data, test_size=test_size, random_state=random_state)
 

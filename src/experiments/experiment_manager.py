@@ -4,22 +4,57 @@ import pandas as pd
 import random
 from Models.BaseModel import BaseModel
 from data_cuts.base_data_cut import BaseDataCut
+from experiments.data_model_experiment import ModelDataTrainingRun
 
 
 class ExperimentManager:
     def __init__(self):
         self.models = {}
         self.data_cuts = {}
+        self.experiments = {}
 
-    def add_model(self, model):
-        if not isinstance(model, BaseModel):
-            raise TypeError(TypeError("Parameter [model] must be of type BaseModel"))
-        self.models[model.get_name()] = model
+    def add_experiment(self, p_model, p_data_cut):
+        """
+        Add an experiment. The model and data_cut are available for exhaustive training.
+        :param p_model:
+        :param p_data_cut:
+        :return:
+        """
+        self.add_model(p_model)
+        self.add_data_cut(p_data_cut)
 
-    def add_data_cut(self, data_cut):
-        if not isinstance(data_cut, BaseDataCut):
+        str_experiment_name = p_model.get_name() + "_" + p_data_cut.get_name()
+        ex = ModelDataTrainingRun(str_experiment_name)
+        self.experiments[str_experiment_name] = ex
+
+    def add_model(self, p_model):
+        """
+        Add a model to this experiment.
+        It will be run against ALL available {@code data_cut}s.
+        :param p_model:
+        :return: None
+        """
+        if not isinstance(p_model, BaseModel):
+            raise TypeError(TypeError("Parameter [p_model] must be of type BaseModel"))
+        self.models[p_model.get_name()] = p_model
+
+    def add_data_cut(self, p_data_cut):
+        """
+        Add a BaseDataCut to this experiment.
+        It will be run against ALL available {@code BaseModel}s.
+        :param p_data_cut:
+        :return: None
+        """
+        if not isinstance(p_data_cut, BaseDataCut):
             raise TypeError(TypeError("Parameter [data_cut] must be of type BaseDataCut"))
-        self.data_cuts[data_cut.get_name()] = data_cut
+        self.data_cuts[p_data_cut.get_name()] = p_data_cut
+
+    def train_and_evaluate_defined_experiments(self):
+        """
+        Iterate through the experiments and run them all
+        :return:
+        """
+        pass
 
     def train_and_evaluate_all_combinations(self):
         # Shuffle model indices
