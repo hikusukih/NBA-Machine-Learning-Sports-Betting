@@ -18,10 +18,10 @@ class XGBModel001(BaseModel):
             self.model = xgb.XGBClassifier(**self.params)
             self.model.fit(X_train, y_train)
             mlflow.log_params(self.params)
-            self.log_model()
+            self.log_mlflow()
 
     def predict(self, x_test):
         return self.model.predict(x_test)
 
-    def log_model(self):
+    def log_mlflow(self):
         mlflow.xgboost.log_model(self.model, self.model_name)

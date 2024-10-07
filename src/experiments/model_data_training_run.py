@@ -6,17 +6,19 @@ from data_cuts.base_data_cut import BaseDataCut
 
 
 class ModelDataTrainingRun:
-    def __init__(self, p_run_name, p_model, p_data_cut, p_params=None):
-        self.my_name = p_run_name
+    def __init__(self, p_model: BaseModel, p_data_cut: BaseDataCut):
+        if not isinstance(p_model, BaseModel):
+            raise TypeError(TypeError("Parameter [p_model] must be of type BaseModel"))
+        if not isinstance(p_data_cut, BaseDataCut):
+            raise TypeError(TypeError("Parameter [p_data_cut] must be of type BaseDataCut"))
+
         self.my_model = p_model
         self.my_data_cut = p_data_cut
-        self.my_params = p_params
+
+    def get_name(self):
+        return self.my_model.get_name() + "_" + self.my_data_cut.get_name()
 
     def train_and_evaluate(self):
-        if not isinstance(input, BaseModel):
-            raise TypeError(TypeError("Parameter [model] must be of type BaseModel"))
-        if not isinstance(input, BaseDataCut):
-            raise TypeError(TypeError("Parameter [data_cut] must be of type BaseDataCut"))
 
         with ((mlflow.start_run())):
             mlflow.log_params(self.my_params)

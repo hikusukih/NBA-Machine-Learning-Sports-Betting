@@ -15,10 +15,10 @@ class NNModel001(BaseModel):
             self.model = MLPClassifier(**self.params)
             self.model.fit(X_train, y_train)
             mlflow.log_params(self.params)
-            self.log_model()
+            self.log_mlflow()
 
     def predict(self, X_test):
         return self.model.predict(X_test)
 
-    def log_model(self):
+    def log_mlflow(self):
         mlflow.sklearn.log_model(self.model, "neuralnet_001_model")

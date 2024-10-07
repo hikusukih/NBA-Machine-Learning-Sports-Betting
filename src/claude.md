@@ -181,7 +181,7 @@ Great question! Handling different cuts of data in a structured and comparable w
 # │   └── team_specific_cut.py
 # ├── experiments/
 # │   ├── experiment_runner.py  # Update this
-# │   └── data_model_experiment.py  # New file
+# │   └── model_data_training_run.py  # New file
 # ...
 
 # data_cuts/base_data_cut.py
@@ -246,7 +246,7 @@ class TeamSpecificCut(BaseDataCut):
       return f"Team_{self.team_name}"
 
 
-# experiments/data_model_experiment.py
+# experiments/model_data_training_run.py
 import mlflow
 from mlflow.tracking import MlflowClient
 
@@ -279,7 +279,7 @@ class DataModelExperiment:
 
 
 # main.py (updated)
-from experiments.data_model_experiment import ModelDataTrainingRun
+from experiments.model_data_training_run import ModelDataTrainingRun
 from models.xgboost_model import XGBoostModel
 from models.neural_network_model import NeuralNetworkModel
 from data_cuts.full_season_cut import FullSeasonCut

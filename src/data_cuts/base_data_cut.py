@@ -53,3 +53,8 @@ class BaseDataCut(ABC):
         :return: pd.Series - Training labels, shape (n_samples_train,)
         """
         pass
+
+    @abstractmethod
+    def log_mlflow(self):
+        pass
+    

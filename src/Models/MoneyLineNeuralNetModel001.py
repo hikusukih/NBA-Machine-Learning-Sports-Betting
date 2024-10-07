@@ -99,5 +99,5 @@ class MoneyLineNeuralNetModel001(BaseModel):
     def predict(self, x_test):
         return np.argmax(self.model.predict(x_test), axis=1)
 
-    def log_model(self):
+    def log_mlflow(self):
         mlflow.sklearn.log_model(self.model, self.model_name)

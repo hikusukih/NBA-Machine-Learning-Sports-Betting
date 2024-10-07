@@ -4,7 +4,7 @@ import pandas as pd
 import random
 from Models.BaseModel import BaseModel
 from data_cuts.base_data_cut import BaseDataCut
-from experiments.data_model_experiment import ModelDataTrainingRun
+from experiments.model_data_training_run import ModelDataTrainingRun
 
 
 class ExperimentManager:
@@ -72,7 +72,7 @@ class ExperimentManager:
             for dc in data_cut_indices:
                 model.train(dc.get_x_train_data(), dc.get_y_train_data())
                 predictions = model.predict(dc.get_x_test_data())
-                model.log_model()
+                model.log_mlflow()
 
                 accuracy = (predictions == dc.get_y_test_data()).mean()
                 print(accuracy.shape)

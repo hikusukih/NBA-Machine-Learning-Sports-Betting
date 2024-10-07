@@ -32,7 +32,7 @@ It's (in process of becoming) in the format of the 2024 way of comparing models
 
 class XGBModel002(BaseModel):
 
-    def log_model(self):
+    def log_mlflow(self):
         mlflow.xgboost.logModel(self.model, "xgboost_inherited_002_model")
         pass
 
@@ -67,7 +67,7 @@ class XGBModel002(BaseModel):
             self.model = xgb.XGBClassifier(**self.params)
             self.model.fit(X_train, y_train)
             mlflow.log_params(self.params)
-            self.log_model()
+            self.log_mlflow()
 
     # def predict(self, x_test):
     #     return self.model.predict(x_test)

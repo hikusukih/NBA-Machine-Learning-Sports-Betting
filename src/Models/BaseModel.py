@@ -31,7 +31,7 @@ class BaseModel(ABC):
         pass
 
     @abstractmethod
-    def log_model(self) -> None:
+    def log_mlflow(self) -> None:
         """Log all of your metrics to mlflow, and a copy of the model for posterity.
 
         Maybe don't log to mlflow in other places? Remember our variables locally?
