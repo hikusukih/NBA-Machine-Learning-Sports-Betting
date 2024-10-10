@@ -10,12 +10,13 @@ from keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
 from Models.BaseModel import BaseModel
 
 
-class MoneyLineNeuralNetModel001(BaseModel):
+class MoneyLineNeuralNetModel002(BaseModel):
     """
-    The MoneyLine model that came with the code
+    The MoneyLine model that I tweak!
     """
     def __init__(self,params=None):
-        super().__init__('MoneyLineNeuralNetModel001')
+        super().__init__('MoneyLineNeuralNetModel002')
+        self.history = None
         self.params = params
 
     def train(self, x_train, y_train):
@@ -54,7 +55,9 @@ class MoneyLineNeuralNetModel001(BaseModel):
         self.model = tf.keras.models.Sequential([
             tf.keras.layers.Flatten(input_shape=(x_train.shape[1],)),
             tf.keras.layers.Dense(512, activation=tf.nn.relu6),
+            tf.keras.layers.Dropout(0.5),  # Dropout layer added
             tf.keras.layers.Dense(256, activation=tf.nn.relu6),
+            tf.keras.layers.Dropout(0.5),  # Dropout layer added
             tf.keras.layers.Dense(128, activation=tf.nn.relu6),
             tf.keras.layers.Dense(2, activation=tf.nn.softmax),
         ])
@@ -72,15 +75,15 @@ class MoneyLineNeuralNetModel001(BaseModel):
         mlflow.log_text(model_summary_str, artifact_file=os.path.abspath(f.name))  # Log the summary as an artifact
 
         # Log parameters
-        # mlflow.log_params(self.params)  # Log initial parameters
         mlflow.log_param("model_name", self.model_name)
         mlflow.log_param("batch_size", 32)  # Example fixed parameter
         mlflow.log_param("epochs", 50)  # Example fixed parameter
 
         # Train the model, logging along the way
-        self.history = self.model.fit(x_train, y_train, epochs=50, validation_split=0.1, batch_size=32,
-                       callbacks=[tensorboard, early_stopping, accuracy_checkpoint, loss_checkpoint])
-
+        self.history = self.model.fit(x_train, y_train,
+                                      epochs=50, validation_split=0.1, batch_size=32,
+                                      callbacks=[tensorboard, early_stopping,
+                                                 accuracy_checkpoint, loss_checkpoint])
 
         # Save the final model as an artifact
         model_final_filename = f"../out/temp/final_model_{self.model_name}.h5"
@@ -94,11 +97,12 @@ class MoneyLineNeuralNetModel001(BaseModel):
         return np.argmax(self.model.predict(x_test), axis=1)
 
     def log_mlflow(self):
-        mlflow.sklearn.log_model(self.model, self.model_name)
+        # Log the model itself as a Keras model
+        mlflow.keras.log_model(self.model, self.model_name)
+        # mlflow.sklearn.log_model(self.model, self.model_name)
         # Log metrics for each epoch (training and validation loss/accuracy)
         for epoch in range(len(self.history.history['loss'])):
             mlflow.log_metric("train_loss", self.history.history['loss'][epoch], step=epoch)
             mlflow.log_metric("val_loss", self.history.history['val_loss'][epoch], step=epoch)
             mlflow.log_metric("train_accuracy", self.history.history['accuracy'][epoch], step=epoch)
             mlflow.log_metric("val_accuracy", self.history.history['val_accuracy'][epoch], step=epoch)
-
