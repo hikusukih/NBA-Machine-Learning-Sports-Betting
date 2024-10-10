@@ -12,8 +12,31 @@ class ExperimentManager:
         self.models = {}
         self.data_cuts = {}
         self.experiments = {}
+        self.experiment_name = "NBA Game Prediction"
         mlflow.set_tracking_uri("http://127.0.0.1:8765")
-        mlflow.set_experiment("NBA Game Prediction")
+        mlflow.set_experiment(self.experiment_name)
+
+    def cleanup_under_performing_models(self):
+        # Get the experiment ID
+        experiment = mlflow.get_experiment_by_name(self.experiment_name)
+        experiment_id = experiment.experiment_id
+
+        # Fetch all runs in the experiment
+        runs = mlflow.search_runs(experiment_ids=experiment_id)
+
+        if 'accuracy' not in runs.columns:
+            raise ValueError("Accuracy metric not found in runs.")
+
+        # Calculate the bottom 50% threshold
+        median_accuracy = runs['accuracy'].median()
+
+        # Identify the runs to delete
+        runs_to_delete = runs[runs['accuracy'] < median_accuracy]
+
+        # Delete the bottom 50% performing runs
+        for run_id in runs_to_delete['run_id']:
+            mlflow.delete_run(run_id)
+            print(f"Deleted run: {run_id} with accuracy: {runs_to_delete[runs_to_delete['run_id'] == run_id]['accuracy'].values[0]}")
 
     def add_experiment(self, p_model, p_data_cut):
         """
@@ -74,17 +97,20 @@ class ExperimentManager:
         for model in model_indices:
             accuracy_list = []
             for dc in data_cut_indices:
-                model.train(dc.get_x_train_data(), dc.get_y_train_data())
-                predictions = model.predict(dc.get_x_test_data())
-                model.log_mlflow()
+                with mlflow.start_run(run_name=model.get_name()):
+                    model.train(dc.get_x_train_data(), dc.get_y_train_data())
+                    predictions = model.predict(dc.get_x_test_data())
+                    model.log_mlflow()
 
-                accuracy = (predictions == dc.get_y_test_data()).mean()
-                print(accuracy.shape)
-                accuracy_list.append(accuracy)
-                # results[model.get_name() + ] = accuracy
-                mlflow.log_metric(f"accuracy_{model.get_name()}_{dc.get_name()}", accuracy)
-                mlflow.log_metric("accuracy", accuracy)
-                mlflow.end_run()
+                    accuracy = (predictions == dc.get_y_test_data()).mean()
+                    print(accuracy.shape)
+                    accuracy_list.append(accuracy)
+                    mlflow.log_metric("accuracy", accuracy)
+
+                    # Log the dataset name as a tag
+                    mlflow.set_tag("datasets_used", dc.get_name())
+                    dc.log_mlflow()
+                    mlflow.end_run()
 
             average_accuracy = sum(accuracy_list) / len(accuracy_list)
             # mlflow.log_metric("average_accuracy", average_accuracy)
