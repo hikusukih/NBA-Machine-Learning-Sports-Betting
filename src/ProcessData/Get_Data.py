@@ -50,11 +50,11 @@ url = 'https://stats.nba.com/stats/' \
       '&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&' \
       'StarterBench=&TeamID=0&TwoWay=0&VsConference=&VsDivision='
 
-# year = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022]
-year = [2023, 2024]
-season = ["2023-24"]
-# season = ["2007-08", "2008-09", "2009-10", "2010-11", "2011-12", "2012-13", "2013-14", "2014-15", "2015-16", "2016-17",
-#           "2017-18", "2018-19", "2019-20", "2020-2021", "2021-2022"]
+year = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022]
+# year = [2023, 2024]
+# season = ["2023-24"]
+season = ["2007-08", "2008-09", "2009-10", "2010-11", "2011-12", "2012-13", "2013-14", "2014-15", "2015-16", "2016-17",
+          "2017-18", "2018-19", "2019-20", "2020-2021", "2021-2022"]
 
 # October through June
 month = [10, 11, 12, 1, 2, 3, 4, 5, 6]
@@ -81,7 +81,7 @@ with tqdm(total=len(season)) as pb_season:
                     for iter_day in days:
                         pb_day.set_description(f"{year[count]}-{iter_month:02}-{iter_day:02}")
                         # No games before October 24
-                        if iter_month == 10 and iter_day < 24:
+                        if iter_month == 10 and iter_day < 15:
                             pb_day.update(1)
                             continue
                         # 30 days hath september, april, june, november
