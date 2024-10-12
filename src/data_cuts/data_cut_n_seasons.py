@@ -18,9 +18,7 @@ class ValidateOnSeasons(BaseDataCut):
                          chain_parent=chain_parent)
         self.season = season_start_year
         self.date_column = date_column
-        self.x_train, self.x_test, self.y_train, self.y_test = self._season_split(
-            feature_data=feature_data,
-            label_data=label_data)
+        self.x_train, self.x_test, self.y_train, self.y_test = self._season_split()
 
     def get_name(self):
         return f"ValidateOnSeasonsSince{self.season}"
@@ -43,7 +41,7 @@ class ValidateOnSeasons(BaseDataCut):
     def get_y_test_data(self):
         return self.y_test
 
-    def _season_split(self, feature_data: pd.DataFrame, label_data: pd.Series):
+    def _season_split(self):
         """Split the data into training and testing sets based on season or date.
 
         Parameters:
@@ -55,19 +53,20 @@ class ValidateOnSeasons(BaseDataCut):
         """
         temp_date_column_name = "temp_date_column_name"
         # Convert the date column to datetime if not already
-        feature_data[temp_date_column_name] = pd.to_datetime(feature_data[self.date_column])
+        df_mask = pd.DataFrame(self.feature_data)
+        df_mask[temp_date_column_name] = pd.to_datetime(df_mask[self.date_column])
 
         # Create a datetime object for October 1 of the season year
         october_first = datetime(self.season, 10, 1)
 
         # Create a boolean mask for train/test based on the selected season/year
-        train_mask = feature_data[temp_date_column_name] < october_first
-        test_mask = feature_data[temp_date_column_name] >= october_first
+        train_mask = df_mask[temp_date_column_name] < october_first
+        test_mask = df_mask[temp_date_column_name] >= october_first
 
         # Apply the mask to get train/test sets
-        x_train, y_train = feature_data[train_mask].drop([temp_date_column_name, self.date_column], axis=1), label_data[
-            train_mask]
-        x_test, y_test = feature_data[test_mask].drop([temp_date_column_name, self.date_column], axis=1), label_data[
-            test_mask]
+        x_train, y_train = (self.feature_data[train_mask].drop([self.date_column], axis=1),
+                            self.label_data[train_mask])
+        x_test, y_test = (self.feature_data[test_mask].drop([self.date_column], axis=1),
+                          self.label_data[test_mask])
 
         return x_train, x_test, y_train, y_test

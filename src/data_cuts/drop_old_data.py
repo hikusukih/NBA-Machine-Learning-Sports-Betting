@@ -23,12 +23,15 @@ class DropOldData(BaseDataCut):
         super().__init__(feature_data=feature_data,
                          label_data=label_data,
                          chain_parent=chain_parent)
+        self.cutoff_year = cutoff_year
         self.drop_old_data(cutoff_year=cutoff_year)
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
-            feature_data.drop(["Date"], axis=1), label_data, test_size=test_size, random_state=random_state)
+            self.feature_data.drop(["Date"], axis=1),
+            self.label_data,
+            test_size=test_size, random_state=random_state)
 
     def get_name(self):
-        return f"DropOldData"
+        return f"DropOldDataBefore{self.cutoff_year}"
 
     def get_processed_feature_data(self):
         return self.feature_data
@@ -52,6 +55,9 @@ class DropOldData(BaseDataCut):
         # October first of the year
         cutoff_date = pd.to_datetime(f"{cutoff_year}-10-01")
 
-        self.feature_data['Date'] = pd.to_datetime(self.feature_data['Date'])
-        self.feature_data = self.feature_data[self.feature_data['Date'] >= cutoff_date]
-        # Remove the label data at the indices of the removed date data - can't remember how!
+        df_dates = pd.DataFrame(self.feature_data)
+        df_dates['Date'] = pd.to_datetime(self.feature_data['Date'])
+
+        indices_to_drop = df_dates[df_dates['Date'] >= cutoff_date].index
+        self.feature_data = self.feature_data.drop(indices_to_drop)
+        self.label_data = self.label_data.drop(indices_to_drop)

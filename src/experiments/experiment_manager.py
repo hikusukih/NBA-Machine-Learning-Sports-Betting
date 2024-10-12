@@ -36,7 +36,8 @@ class ExperimentManager:
         # Delete the bottom 50% performing runs
         for run_id in runs_to_delete['run_id']:
             mlflow.delete_run(run_id)
-            print(f"Deleted run: {run_id} with accuracy: {runs_to_delete[runs_to_delete['run_id'] == run_id]['accuracy'].values[0]}")
+            print(
+                f"Deleted run: {run_id} with accuracy: {runs_to_delete[runs_to_delete['run_id'] == run_id]['accuracy'].values[0]}")
 
     def add_experiment(self, p_model, p_data_cut):
         """
@@ -100,15 +101,13 @@ class ExperimentManager:
                 with mlflow.start_run(run_name=model.get_name()):
                     model.train(dc.get_x_train_data(), dc.get_y_train_data())
                     predictions = model.predict(dc.get_x_test_data())
-                    model.log_mlflow()
 
                     accuracy = (predictions == dc.get_y_test_data()).mean()
                     print(accuracy.shape)
                     accuracy_list.append(accuracy)
                     mlflow.log_metric("accuracy", accuracy)
 
-                    # Log the dataset name as a tag
-                    mlflow.set_tag("datasets_used", dc.get_name())
+                    model.log_mlflow()
                     dc.log_mlflow()
                     mlflow.end_run()
 
