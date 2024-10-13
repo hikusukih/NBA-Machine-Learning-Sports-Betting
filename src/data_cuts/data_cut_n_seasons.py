@@ -3,7 +3,7 @@ from data_cuts.base_data_cut import BaseDataCut
 from datetime import datetime
 
 
-class ValidateOnSeasons(BaseDataCut):
+class DropSeasonsBeforeDate(BaseDataCut):
     """This is a "terminal" data_cut in that you consume its train/test/label data
     """
 
@@ -16,12 +16,12 @@ class ValidateOnSeasons(BaseDataCut):
         super().__init__(feature_data=feature_data,
                          label_data=label_data,
                          chain_parent=chain_parent)
-        self.season = season_start_year
+        self.season_start_year = season_start_year
         self.date_column = date_column
         self.x_train, self.x_test, self.y_train, self.y_test = self._season_split()
 
     def get_name(self):
-        return f"ValidateOnSeasonsSince{self.season}"
+        return f"ValidateOnSeasonsSince{self.season_start_year}"
 
     def get_processed_feature_data(self) -> pd.DataFrame:
         return self.feature_data
@@ -57,7 +57,7 @@ class ValidateOnSeasons(BaseDataCut):
         df_mask[temp_date_column_name] = pd.to_datetime(df_mask[self.date_column])
 
         # Create a datetime object for October 1 of the season year
-        october_first = datetime(self.season, 10, 1)
+        october_first = datetime(self.season_start_year, 10, 1)
 
         # Create a boolean mask for train/test based on the selected season/year
         train_mask = df_mask[temp_date_column_name] < october_first

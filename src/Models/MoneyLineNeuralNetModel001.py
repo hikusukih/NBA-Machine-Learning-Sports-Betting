@@ -94,7 +94,7 @@ class MoneyLineNeuralNetModel001(BaseModel):
         return np.argmax(self.model.predict(x_test), axis=1)
 
     def log_mlflow(self):
-        mlflow.sklearn.log_model(self.model, self.model_name)
+        mlflow.keras.log_model(self.model, self.model_name)
         # Log metrics for each epoch (training and validation loss/accuracy)
         for epoch in range(len(self.history.history['loss'])):
             mlflow.log_metric("train_loss", self.history.history['loss'][epoch], step=epoch)

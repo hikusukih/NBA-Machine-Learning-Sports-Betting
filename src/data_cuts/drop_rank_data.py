@@ -3,7 +3,7 @@ from data_cuts.base_data_cut import BaseDataCut
 from sklearn.model_selection import train_test_split
 
 
-class DropRankData(BaseDataCut):
+class DropRankFeatures(BaseDataCut):
     def __init__(self,
                  feature_data: pd.DataFrame,
                  label_data: pd.Series,
