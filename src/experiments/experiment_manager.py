@@ -1,7 +1,11 @@
+import os
+import shutil
+
 import mlflow
-import numpy as np
-import pandas as pd
 import random
+
+import yaml
+
 from Models.BaseModel import BaseModel
 from data_cuts.base_data_cut import BaseDataCut
 from experiments.model_data_training_run import ModelDataTrainingRun
@@ -15,6 +19,7 @@ class ExperimentManager:
         self.experiment_name = "NBA Game Prediction"
         mlflow.set_tracking_uri("http://127.0.0.1:8765")
         mlflow.set_experiment(self.experiment_name)
+        self.mlflow_dir_path = "C:\\Users\\david\\code\\NBA-Machine-Learning-Sports-Betting\\mlflow"
 
     def cleanup_under_performing_models(self):
         # Get the experiment ID
@@ -24,20 +29,50 @@ class ExperimentManager:
         # Fetch all runs in the experiment
         runs = mlflow.search_runs(experiment_ids=experiment_id)
 
-        if 'accuracy' not in runs.columns:
+        if 'metrics.accuracy' not in runs.columns:
             raise ValueError("Accuracy metric not found in runs.")
 
         # Calculate the bottom 50% threshold
-        median_accuracy = runs['accuracy'].median()
+        median_accuracy = runs['metrics.accuracy'].median()
 
         # Identify the runs to delete
-        runs_to_delete = runs[runs['accuracy'] < median_accuracy]
+        runs_to_delete = runs[runs['metrics.accuracy'] < median_accuracy]
 
         # Delete the bottom 50% performing runs
         for run_id in runs_to_delete['run_id']:
-            mlflow.delete_run(run_id)
-            print(
-                f"Deleted run: {run_id} with accuracy: {runs_to_delete[runs_to_delete['run_id'] == run_id]['accuracy'].values[0]}")
+            if not self.is_run_in_saved_models(run_id):
+                mlflow.delete_run(run_id)
+                # Manually delete run files from the filesystem
+                self.delete_ml_flow_artifacts(experiment_id=experiment_id, run_id=run_id)
+
+    def is_run_in_saved_models(self, run_id: str) -> bool:
+        """
+        Checks if the run_id exists in any meta.yaml file under the models directory.
+        """
+        ml_runs_dir = os.path.join(self.mlflow_dir_path, 'mlruns')
+        models_dir = os.path.join(ml_runs_dir, 'models')
+
+        # Walk through the models directory and search for meta.yaml files
+        for root, dirs, files in os.walk(models_dir):
+            if 'meta.yaml' in files:
+                meta_file_path = os.path.join(root, 'meta.yaml')
+                with open(meta_file_path, 'r') as file:
+                    meta_data = yaml.safe_load(file)
+
+                    # If the run_id in the meta.yaml matches the current run_id, return True
+                    if meta_data.get('run_id') == run_id:
+                        return True
+
+        # Return False if no matching run_id is found
+        return False
+
+    def delete_ml_flow_artifacts(self, experiment_id: str, run_id: str) -> None:
+        artifact_dir = f"{self.mlflow_dir_path}\\mlartifacts\\{experiment_id}\\{run_id}"
+        if os.path.exists(artifact_dir):
+            shutil.rmtree(artifact_dir)
+            print(f"Deleted run {run_id}")
+        else:
+            print(f"Run directory {artifact_dir} does not exist.")
 
     def add_experiment(self, p_model, p_data_cut):
         """
