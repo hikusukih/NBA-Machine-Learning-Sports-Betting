@@ -3,6 +3,7 @@ import random
 import sqlite3
 import sys
 import time
+from calendar import monthrange
 from datetime import date, datetime, timedelta
 
 from tqdm import tqdm
@@ -49,12 +50,17 @@ url = 'https://stats.nba.com/stats/' \
       'Season={4}' \
       '&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&' \
       'StarterBench=&TeamID=0&TwoWay=0&VsConference=&VsDivision='
+# ALL years. Don't do this more than once, you saved it already!
+# year = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+# season = ["2007-08", "2008-09", "2009-10", "2010-11", "2011-12", "2012-13", "2013-14", "2014-15", "2015-16", "2016-17",
+#           "2017-18", "2018-19", "2019-20", "2020-2021", "2021-2022", "2022-2023", "2023-2024"]
 
-year = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022]
-# year = [2023, 2024]
-# season = ["2023-24"]
-season = ["2007-08", "2008-09", "2009-10", "2010-11", "2011-12", "2012-13", "2013-14", "2014-15", "2015-16", "2016-17",
-          "2017-18", "2018-19", "2019-20", "2020-2021", "2021-2022"]
+year = [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+season = ["2008-09", "2009-10", "2010-11", "2011-12", "2012-13", "2013-14", "2014-15", "2015-16", "2016-17",
+          "2017-18", "2018-19", "2019-20", "2020-2021", "2021-2022", "2022-2023", "2023-2024"]
+
+# year = [2023, 2024] # Update with the current/recent season data
+# season = ["2023-24"] # update with the current/recent season data
 
 # October through June
 month = [10, 11, 12, 1, 2, 3, 4, 5, 6]
@@ -67,7 +73,7 @@ count = 0
 
 con = sqlite3.connect("../../Data/teams.sqlite")
 
-# // Iterate through all seasons/years/months/days. "pb_" stands for "progress bar"
+# Iterate through all seasons/years/months/days. "pb_" stands for "progress bar"
 with tqdm(total=len(season)) as pb_season:
     for iter_season in season:
         pb_season.set_description(f"Season: {iter_season}")
@@ -80,16 +86,12 @@ with tqdm(total=len(season)) as pb_season:
                 with tqdm(total=len(days)) as pb_day:
                     for iter_day in days:
                         pb_day.set_description(f"{year[count]}-{iter_month:02}-{iter_day:02}")
-                        # No games before October 24
+                        # No games before October 24 (use 15 just in case)
                         if iter_month == 10 and iter_day < 15:
                             pb_day.update(1)
                             continue
-                        # 30 days hath september, april, june, november
-                        if iter_month in [4, 6, 9, 11] and iter_day > 30:
-                            pb_day.update(1)
-                            continue
-                        # February - This is for a leap year
-                        if iter_month == 2 and iter_day > 29:
+                        # Check if the day is valid for the month and year
+                        if iter_day > monthrange(end_year_pointer, iter_month)[1]:
                             pb_day.update(1)
                             continue
                         # Don't get game data about "today"
@@ -104,11 +106,17 @@ with tqdm(total=len(season)) as pb_season:
                         url_formatted = url.format(iter_month, iter_day, begin_year_pointer, end_year_pointer, iter_season)
                         general_data = get_json_data(url_formatted)
                         general_df = to_data_frame(general_data)
-                        real_date = date(year=end_year_pointer, month=iter_month, day=iter_day) + timedelta(days=1)
+
+                        try:
+                            real_date = date(year=end_year_pointer, month=iter_month, day=iter_day) + timedelta(days=1)
+                        except ValueError:
+                            pb_day.update(1)
+                            continue
+
                         general_df['Date'] = str(real_date)
 
                         x = str(real_date).split('-')
-                        general_df.to_sql(f"teams_{iter_season}-{str(int(x[1]))}-{str(int(x[2]))}", con, if_exists="replace")
+                        general_df.to_sql(f"teams_{iter_season}-{str(int(x[1]))}-{str(int(x[2]))}", con=con, if_exists="replace")
 
                         # Rest a while, randomize the requests
                         time.sleep(random.randint(2, 4))
