@@ -3,7 +3,6 @@ import sqlite3
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.impute import SimpleImputer
 
 
 class InitialDataProcessor:
@@ -37,9 +36,21 @@ class InitialDataProcessor:
         print(f"Data loaded. Shape: {self.data.shape}")
 
     def preprocess_data(self):
-        # Assuming 'home_team_win' is the target variable
-        target_variable_column_name = 'Home-Team-Win'
-        self.y = self.data[target_variable_column_name]
+        """Do broad processing to the test/train and label data
+        1
+        Any transformations will be stored as new columns
+
+        Labels and predictors like Score will be removed from test/train data
+
+        :return:
+        """
+        # 'home_team_win' is the moneyline target variable
+        moneyline_target_column_name = 'Home-Team-Win'
+        self.y = self.data[moneyline_target_column_name]
+
+        score_column_name = 'Score'
+        overunder_target_variable_column_name = 'OU-Cover'
+        ou_determinant_column_name = 'OU'
 
         # Handle strings - they'll be turned into numbers.
         team_name_1_column_name = 'TEAM_NAME'
@@ -68,14 +79,20 @@ class InitialDataProcessor:
         # Replace your date column with days since reference date
         self.data[date_as_number_column_name] = (self.data[date_column_name] - reference_date).dt.days
 
+
+        # Save the 'Date.1' column for later re-insertion
+        date_column_data = self.data[date_column_name]
+
         # Drop columns we factored out, replaced, or that are essentially "cheating" (info not available at game time)
-        self.X = self.data.drop(['Score',
-                                 target_variable_column_name,
-                                 'OU', 'OU-Cover',
-                                 date_column_name,
-                                 date_1_column_name,
-                                 team_name_1_column_name,
-                                 team_name_2_column_name], axis=1)
+
+        df_pre_scale = self.data.drop(['Score',
+                                      moneyline_target_column_name,
+                                       ou_determinant_column_name,
+                                      overunder_target_variable_column_name,
+                                      date_column_name,
+                                      date_1_column_name,
+                                      team_name_1_column_name,
+                                      team_name_2_column_name], axis=1)
 
         # Handle missing values
         # imputer = SimpleImputer(strategy='mean')
@@ -83,7 +100,11 @@ class InitialDataProcessor:
 
         # Normalize numerical features
         scaler = StandardScaler()
-        self.X = pd.DataFrame(scaler.fit_transform(self.X), columns=self.X.columns)
+        df_scaled = pd.DataFrame(scaler.fit_transform(df_pre_scale), columns=df_pre_scale.columns)
+        df_scaled[date_column_name] = date_column_data
+
+        self.X = df_scaled
+
 
         print("Data preprocessed.")
 
