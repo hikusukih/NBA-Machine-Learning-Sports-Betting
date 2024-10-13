@@ -14,11 +14,10 @@ class XGBModel001(BaseModel):
         self.params = params
 
     def train(self, X_train, y_train):
-        with mlflow.start_run(run_name=self.model_name):
-            self.model = xgb.XGBClassifier(**self.params)
-            self.model.fit(X_train, y_train)
-            mlflow.log_params(self.params)
-            self.log_mlflow()
+        self.model = xgb.XGBClassifier(**self.params)
+        self.model.fit(X_train, y_train)
+        mlflow.log_params(self.params)
+        self.log_mlflow()
 
     def predict(self, x_test):
         return self.model.predict(x_test)
